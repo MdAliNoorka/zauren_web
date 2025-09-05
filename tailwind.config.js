@@ -60,6 +60,7 @@ module.exports = {
         'scale-in': 'scaleIn 0.3s ease-out',
         'bounce-gentle': 'bounceGentle 2s infinite',
         'gradient-shift': 'gradientShift 3s ease-in-out infinite',
+        'nav-float': 'navFloat 0.5s ease-out',
       },
       keyframes: {
         fadeIn: {
@@ -85,6 +86,10 @@ module.exports = {
         gradientShift: {
           '0%, 100%': { backgroundPosition: '0% 50%' },
           '50%': { backgroundPosition: '100% 50%' },
+        },
+        navFloat: {
+          '0%': { transform: 'translateX(-50%) translateY(-10px)', opacity: '0' },
+          '100%': { transform: 'translateX(-50%) translateY(0)', opacity: '1' },
         },
       },
       backgroundImage: {

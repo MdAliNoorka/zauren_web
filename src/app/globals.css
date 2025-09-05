@@ -59,6 +59,10 @@
     @apply bg-white/10 dark:bg-secondary-900/10 backdrop-blur-md border border-white/20 dark:border-secondary-700/20;
   }
 
+  .floating-nav {
+    @apply shadow-2xl backdrop-blur-md bg-white/80 dark:bg-secondary-900/80 border border-white/20 dark:border-secondary-700/20;
+  }
+
   .section-padding {
     @apply px-4 sm:px-6 lg:px-8 py-16 lg:py-24;
   }
