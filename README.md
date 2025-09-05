@@ -1,62 +1,95 @@
 # Zauren Web
 
-A modern, responsive website for Zauren - AI-powered customer service agents for ecommerce.
+A modern, responsive website for Zauren - AI-powered customer service agents for ecommerce with full authentication system.
 
-## Features
+## ✨ Features
 
-- 🚀 **Modern Stack**: Next.js 14, TypeScript, Tailwind CSS
+- 🚀 **Modern Stack**: Next.js 14, TypeScript, Tailwind CSS, Supabase
+- 🔐 **Authentication**: Email/password + Google OAuth with Supabase Auth
 - 🎨 **Beautiful Design**: Responsive, dark/light mode, smooth animations
 - 🔧 **Developer Experience**: ESLint, TypeScript, hot reload
 - 📱 **Mobile First**: Fully responsive design
 - 🌙 **Dark Mode**: System preference detection with manual toggle
 - ⚡ **Performance**: Optimized for speed and SEO
-- 🔒 **Backend Integration**: Supabase for database and authentication
+- �️ **Security**: Row Level Security, protected routes, middleware
 
-## Pages
+## 📱 Pages
 
 - **Landing Page**: Modern hero section, features, stats, and testimonials
-- **Pricing Page**: Interactive pricing tiers with monthly/annual toggle
+- **Pricing Page**: Interactive pricing tiers with monthly/annual toggle  
 - **Contact Page**: Contact form, office locations, and FAQ
+- **Authentication**: Sign-in, sign-up, password reset, email confirmation
+- **Dashboard**: Protected user area (sample implementation)
 
-## Getting Started
+## 🚀 Quick Start
 
 ### Prerequisites
 
 - Node.js 18+ 
 - npm or yarn
-- Supabase account (optional for full functionality)
+- Supabase account
 
-### Installation
+### 1. Clone & Install
 
-1. Clone the repository:
 ```bash
 git clone https://github.com/your-username/zauren-web.git
 cd zauren-web
-```
-
-2. Install dependencies:
-```bash
 npm install
 ```
 
-3. Set up environment variables:
+### 2. Run Setup Script
+
+**Windows:**
 ```bash
-cp .env.example .env.local
+.\setup-auth.bat
 ```
 
-Edit `.env.local` with your configuration:
-- Supabase URL and keys
-- SMTP settings for contact forms
-- Analytics IDs
+**Linux/Mac:**
+```bash
+chmod +x setup-auth.sh
+./setup-auth.sh
+```
 
-4. Run the development server:
+### 3. Configure Authentication
+
+Follow the detailed setup guide:
+📖 **[Complete Setup Guide](SETUP_GUIDE.md)** - Step-by-step Supabase & Google OAuth setup
+
+### 4. Start Development
+
 ```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view the website.
+Visit [http://localhost:3001](http://localhost:3001) to view the website.
 
-### Development Commands
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| 📖 [**SETUP_GUIDE.md**](SETUP_GUIDE.md) | Complete setup instructions for Supabase & Google OAuth |
+| 🔧 [**TROUBLESHOOTING.md**](TROUBLESHOOTING.md) | Common issues and solutions |
+| 📋 [**.env.template**](.env.template) | Environment variables template |
+
+## 🔐 Authentication Features
+
+### What's Included
+- ✅ Email/password authentication
+- ✅ Google OAuth sign-in
+- ✅ Email confirmation
+- ✅ Password reset
+- ✅ Protected routes
+- ✅ User session management
+- ✅ Responsive auth forms
+- ✅ Dark/light mode support
+
+### Quick Test
+1. Visit `/auth/status` to check your setup
+2. Try `/auth/signup` to create an account
+3. Test `/auth/signin` to sign in
+4. Access `/dashboard` (protected route)
+
+## 🛠️ Development Commands
 
 ```bash
 # Development server
@@ -73,116 +106,150 @@ npm run lint
 
 # Type check
 npm run type-check
+
+# Run auth setup (Windows)
+.\setup-auth.bat
 ```
 
-## Project Structure
+## 📁 Project Structure
 
 ```
 src/
-├── app/                 # Next.js app router pages
-│   ├── page.tsx        # Landing page
-│   ├── pricing/        # Pricing page
-│   ├── contact/        # Contact page
-│   ├── layout.tsx      # Root layout
-│   └── globals.css     # Global styles
-├── components/         # Reusable components
-│   └── ui/            # UI components
-├── lib/               # Utilities and configurations
-├── types/             # TypeScript type definitions
-├── hooks/             # Custom React hooks
-└── utils/             # Utility functions
+├── app/
+│   ├── auth/              # Authentication pages
+│   │   ├── signin/        # Sign-in page
+│   │   ├── signup/        # Sign-up page
+│   │   ├── callback/      # OAuth callback handler
+│   │   └── status/        # Setup verification page
+│   ├── dashboard/         # Protected dashboard
+│   ├── page.tsx          # Landing page
+│   ├── pricing/          # Pricing page
+│   ├── contact/          # Contact page
+│   └── layout.tsx        # Root layout
+├── components/
+│   ├── auth/             # Authentication components
+│   │   ├── SignInForm.tsx
+│   │   └── SignUpForm.tsx
+│   └── ui/               # UI components
+├── lib/
+│   ├── supabase.ts       # Client-side Supabase config
+│   ├── supabase-server.ts # Server-side Supabase config
+│   └── auth-schemas.ts   # Form validation schemas
+├── hooks/
+│   └── useAuth.ts        # Authentication hook
+├── types/
+│   └── database.ts       # Database type definitions
+└── middleware.ts         # Route protection middleware
 ```
 
-## Key Components
+## 🔧 Environment Setup
 
-### UI Components
-- **Button**: Flexible button component with variants
-- **Card**: Container component for content sections
-- **Input**: Form input component with validation
-- **Navigation**: Responsive navigation with theme toggle
+### Required Variables
 
-### Features
-- **Responsive Design**: Mobile-first approach
-- **Dark Mode**: System preference detection
-- **Animations**: Smooth CSS animations and transitions
-- **Form Handling**: Contact form with validation
-- **SEO Optimized**: Meta tags, structured data
+Create `.env.local` (use `.env.template` as reference):
 
-## Customization
+```env
+# Supabase (required)
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-service-key
 
-### Colors
-Edit `tailwind.config.js` to customize the color palette:
-- Primary: Blue tones for main branding
-- Secondary: Gray tones for text and backgrounds
-- Accent: Purple tones for highlights
+# Site URL
+NEXT_PUBLIC_SITE_URL=http://localhost:3001
+```
 
-### Typography
-- Primary font: Inter
-- Monospace font: JetBrains Mono
+### Getting Supabase Credentials
 
-### Animations
-Custom animations defined in `globals.css`:
-- `fade-in`: Smooth fade in effect
-- `slide-up`: Slide up animation
-- `scale-in`: Scale in animation
+1. Create project at [supabase.com](https://supabase.com)
+2. Go to **Settings** → **API**
+3. Copy **Project URL** and **anon public key**
+4. Copy **service_role secret key** (keep secret!)
 
-## Backend Integration
-
-The website integrates with Supabase for:
-- Contact form submissions
-- Newsletter subscriptions
-- User analytics (optional)
-
-Database schema is defined in `src/lib/supabase.ts`.
-
-## Deployment
+## 🌐 Deployment
 
 ### Vercel (Recommended)
 
-1. Connect your GitHub repository to Vercel
-2. Configure environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
+1. Push code to GitHub
+2. Connect repository to Vercel
+3. Add environment variables in Vercel dashboard
+4. Update Supabase auth settings with production URLs
 
-### Other Platforms
+### Production Checklist
 
-The website can be deployed to any platform that supports Next.js:
-- Netlify
-- AWS Amplify
-- Railway
-- Digital Ocean
+- [ ] Update `NEXT_PUBLIC_SITE_URL` to production domain
+- [ ] Configure Supabase auth settings for production
+- [ ] Set up Google OAuth production credentials
+- [ ] Enable email confirmations
+- [ ] Test all authentication flows
 
-## Environment Variables
+## 🔍 Testing Authentication
 
-Required environment variables:
+### Manual Testing
+```bash
+# 1. Check setup status
+curl http://localhost:3001/auth/status
 
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-NEXT_PUBLIC_APP_URL=your_app_url
+# 2. Test sign-up
+# Visit /auth/signup in browser
+
+# 3. Test sign-in  
+# Visit /auth/signin in browser
+
+# 4. Test protected route
+# Visit /dashboard (should redirect if not logged in)
 ```
 
-Optional:
-```env
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_USER=your_email
-SMTP_PASS=your_password
-NEXT_PUBLIC_GA_ID=your_analytics_id
-```
+### Using the Status Page
+Visit `/auth/status` in your browser to verify:
+- Environment variables
+- Supabase connection
+- Authentication providers
+- Overall system health
 
-## Contributing
+## 🎨 Customization
+
+### Colors & Theming
+Edit `tailwind.config.js` and `globals.css`:
+- Primary: Blue tones for main branding
+- Secondary: Gray tones for text and backgrounds  
+- Accent: Purple tones for highlights
+
+### Authentication UI
+Customize auth forms in `src/components/auth/`:
+- Form styling and layout
+- Validation messages
+- Social auth buttons
+- Loading states
+
+## 📖 Additional Resources
+
+- [Supabase Auth Documentation](https://supabase.com/docs/guides/auth)
+- [Next.js App Router](https://nextjs.org/docs/app)
+- [Google OAuth Setup](https://console.cloud.google.com/)
+- [Tailwind CSS](https://tailwindcss.com/docs)
+
+## 🆘 Getting Help
+
+Having issues? Try these steps:
+
+1. 📋 Check the [**Troubleshooting Guide**](TROUBLESHOOTING.md)
+2. 🔍 Visit `/auth/status` to diagnose issues  
+3. 🌐 Check [Supabase Discord](https://discord.supabase.com)
+4. 📧 Email support@zauren.dev
+5. 🐛 Create a GitHub issue
+
+## 🤝 Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes
-4. Test thoroughly
+3. Follow the coding standards
+4. Test authentication flows
 5. Submit a pull request
 
-## License
+## 📄 License
 
 This project is licensed under the MIT License.
 
-## Support
+---
 
-For support, email support@zauren.dev or create an issue on GitHub.
+**🎉 Ready to transform customer service with AI? Get started with Zauren today!**
