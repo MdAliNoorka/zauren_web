@@ -18,24 +18,37 @@ export function Navigation({ items, logo, logoText = 'Zauren', className }: Navi
   const [isDark, setIsDark] = React.useState(false)
   const [isScrolled, setIsScrolled] = React.useState(false)
 
-  // Scroll detection with throttling
+  // Scroll detection with debouncing and hysteresis
   React.useEffect(() => {
-    let ticking = false
+    let timeoutId: NodeJS.Timeout
+    let lastScrollY = 0
 
     const handleScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          const scrollPosition = window.scrollY
-          setIsScrolled(scrollPosition > 50) // Increased threshold for stability
-          ticking = false
-        })
-        ticking = true
-      }
+      const currentScrollY = window.scrollY
+      
+      // Clear previous timeout
+      clearTimeout(timeoutId)
+      
+      // Use hysteresis to prevent jittery behavior
+      const threshold = isScrolled ? 30 : 80 // Different thresholds for up/down
+      
+      timeoutId = setTimeout(() => {
+        if (currentScrollY > threshold && !isScrolled) {
+          setIsScrolled(true)
+        } else if (currentScrollY <= threshold && isScrolled) {
+          setIsScrolled(false)
+        }
+      }, 10) // Small delay to debounce
+      
+      lastScrollY = currentScrollY
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      clearTimeout(timeoutId)
+    }
+  }, [isScrolled])
 
   // Theme detection and toggle
   React.useEffect(() => {
@@ -65,14 +78,14 @@ export function Navigation({ items, logo, logoText = 'Zauren', className }: Navi
 
   return (
     <nav className={cn(
-      'fixed top-0 w-full z-50 transition-all duration-500 ease-out',
+      'fixed top-0 w-full z-50 transition-all duration-700 ease-in-out',
       isScrolled 
         ? 'top-6 left-1/2 transform -translate-x-1/2 w-[calc(100%-4rem)] max-w-5xl mx-auto rounded-2xl shadow-2xl backdrop-blur-md bg-white/80 dark:bg-secondary-900/80 border border-white/20 dark:border-secondary-700/20' 
         : 'top-0 left-0 transform-none w-full bg-white/10 dark:bg-secondary-900/10 backdrop-blur-md border-b border-white/20 dark:border-secondary-700/20',
       className
     )}>
       <div className={cn(
-        'transition-all duration-500 ease-out',
+        'transition-all duration-700 ease-in-out',
         isScrolled ? 'px-6 py-4' : 'container-width section-padding py-6'
       )}>
         <div className="flex items-center justify-between">
