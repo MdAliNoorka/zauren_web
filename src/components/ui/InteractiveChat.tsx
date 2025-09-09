@@ -138,8 +138,17 @@ export function InteractiveChat() {
             <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
             <div className="w-3 h-3 bg-green-500 rounded-full"></div>
           </div>
-          <div className="text-xs text-secondary-500 font-mono bg-secondary-100 dark:bg-secondary-800 px-2 py-1 rounded">
-            AI AGENT LIVE
+          <div className="text-xs text-secondary-500 font-mono bg-secondary-100 dark:bg-secondary-800 px-2 py-1 rounded relative overflow-hidden group animate-ai-badge hover:animate-glow-pulse transition-all duration-300">
+            <div className="flex items-center gap-1">
+              <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-live-blink"></div>
+              <span className="relative z-10">AI AGENT LIVE</span>
+              <div className="flex gap-0.5 ml-1">
+                <div className="w-0.5 h-0.5 bg-secondary-500 rounded-full animate-bounce"></div>
+                <div className="w-0.5 h-0.5 bg-secondary-500 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
+                <div className="w-0.5 h-0.5 bg-secondary-500 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
+              </div>
+            </div>
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-primary-200/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
           </div>
         </div>
         

@@ -71,15 +71,9 @@ export function Navigation({ items, logo, logoText = 'Zauren', className }: Navi
 
   // Theme detection and toggle
   React.useEffect(() => {
-    const isDarkMode = document.documentElement.classList.contains('dark') ||
-      (!document.documentElement.classList.contains('light') && 
-       window.matchMedia('(prefers-color-scheme: dark)').matches)
-    
+    // Sync state with current theme
+    const isDarkMode = document.documentElement.classList.contains('dark')
     setIsDark(isDarkMode)
-    
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark')
-    }
   }, [])
 
   const toggleTheme = () => {
@@ -89,9 +83,11 @@ export function Navigation({ items, logo, logoText = 'Zauren', className }: Navi
     if (newIsDark) {
       document.documentElement.classList.add('dark')
       document.documentElement.classList.remove('light')
+      localStorage.setItem('theme', 'dark')
     } else {
       document.documentElement.classList.add('light')
       document.documentElement.classList.remove('dark')
+      localStorage.setItem('theme', 'light')
     }
   }
 

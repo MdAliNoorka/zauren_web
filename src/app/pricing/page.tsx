@@ -24,7 +24,7 @@ const pricingTiers: PricingTier[] = [
     description: 'Great for startups',
     badge: 'Most Popular',
     highlighted: false,
-    buttonText: 'Start Free Trial',
+    buttonText: 'Get Started Free',
     buttonVariant: 'outline',
     limits: {
       tokens: '10M tokens / mo',
@@ -46,7 +46,7 @@ const pricingTiers: PricingTier[] = [
     description: 'Scale to multiple channels with order tracking & standard insights',
     badge: 'For busy teams',
     highlighted: true,
-    buttonText: 'Choose Growth',
+    buttonText: 'Choose Professional',
     buttonVariant: 'primary',
     limits: {
       tokens: '50M tokens / mo (~2,500 msgs)',
@@ -69,7 +69,7 @@ const pricingTiers: PricingTier[] = [
     description: 'High-volume support with predictive insights and custom workflows',
     badge: 'Custom',
     highlighted: false,
-    buttonText: 'Upgrade to Pro',
+    buttonText: 'Choose Growth',
     buttonVariant: 'outline',
     limits: {
       tokens: '200M tokens / mo (~10,000 msgs)',
@@ -124,6 +124,41 @@ const faqs = [
 
 export default function PricingPage() {
   const [isAnnual, setIsAnnual] = useState(false)
+  const [aiQuestion, setAiQuestion] = useState('')
+  const [aiAnswer, setAiAnswer] = useState('')
+  const [isAiLoading, setIsAiLoading] = useState(false)
+
+  const handleAiQuestion = async () => {
+    if (!aiQuestion.trim()) return
+    
+    const currentQuestion = aiQuestion
+    setAiQuestion('') // Clear input immediately
+    setIsAiLoading(true)
+    setAiAnswer('') // Clear previous answer
+    
+    try {
+      const response = await fetch('/api/faq-ai', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ question: currentQuestion }),
+      })
+      
+      const data = await response.json()
+      
+      if (response.ok) {
+        setAiAnswer(data.answer)
+      } else {
+        setAiAnswer(data.answer || "I'm sorry, I'm experiencing technical difficulties. Please try again or contact our support team.")
+      }
+    } catch (error) {
+      console.error('AI FAQ error:', error)
+      setAiAnswer("I'm sorry, I'm experiencing technical difficulties. Please try again or contact our support team.")
+    } finally {
+      setIsAiLoading(false)
+    }
+  }
 
   const getPrice = (tier: PricingTier) => {
     if (tier.id === 'enterprise') return 'Custom'
@@ -149,67 +184,68 @@ export default function PricingPage() {
       />
 
       {/* Header */}
-      <section className="section-padding pt-32 lg:pt-40 bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950">
+      <section className="pt-24 lg:pt-32 pb-8 lg:pb-12 bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950">
         <div className="container-width text-center">
-          <div className="max-w-3xl mx-auto space-y-8 animate-slide-up">
-            <div className="space-y-4">
-              <div className="inline-flex items-center px-4 py-2 bg-primary-100 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-full text-sm font-medium">
-                💰 Simple, Transparent Pricing
-              </div>
-              <h1 className="text-4xl lg:text-6xl font-bold text-balance leading-tight">
+          <div className="max-w-3xl mx-auto space-y-6 animate-slide-up">
+            <div className="space-y-3">
+              <h1 className="text-3xl lg:text-5xl font-bold text-balance leading-tight">
                 Choose Your <span className="gradient-text">Perfect Plan</span>
               </h1>
-              <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-2xl mx-auto text-balance">
+              <p className="text-lg text-secondary-600 dark:text-secondary-400 max-w-2xl mx-auto text-balance">
                 Start free, scale as you grow. All plans include our core AI agent features with no hidden fees.
               </p>
             </div>
 
             {/* Billing Toggle */}
-            <div className="flex items-center justify-center space-x-4">
-              <span className={`text-sm font-medium ${!isAnnual ? 'text-secondary-900 dark:text-secondary-100' : 'text-secondary-500 dark:text-secondary-400'}`}>
-                Monthly
-              </span>
-              <button
-                onClick={() => setIsAnnual(!isAnnual)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                  isAnnual ? 'bg-primary-600' : 'bg-secondary-200 dark:bg-secondary-700'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    isAnnual ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-              <span className={`text-sm font-medium ${isAnnual ? 'text-secondary-900 dark:text-secondary-100' : 'text-secondary-500 dark:text-secondary-400'}`}>
-                Annual
-              </span>
-              {isAnnual && (
-                <span className="inline-flex items-center px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-full text-xs font-medium">
-                  Save 20%
+            <div className="flex items-center justify-center">
+              <div className="flex items-center space-x-4 relative">
+                <span className={`text-sm font-medium ${!isAnnual ? 'text-secondary-900 dark:text-secondary-100' : 'text-secondary-500 dark:text-secondary-400'}`}>
+                  Monthly
                 </span>
-              )}
+                <button
+                  onClick={() => setIsAnnual(!isAnnual)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    isAnnual ? 'bg-primary-600' : 'bg-secondary-200 dark:bg-secondary-700'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      isAnnual ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+                <span className={`text-sm font-medium ${isAnnual ? 'text-secondary-900 dark:text-secondary-100' : 'text-secondary-500 dark:text-secondary-400'}`}>
+                  Annual
+                </span>
+                <div className={`absolute -right-20 transition-all duration-300 ${isAnnual ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-2 pointer-events-none'}`}>
+                  <span className="inline-flex items-center px-2 py-1 bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-full text-xs font-medium whitespace-nowrap">
+                    Save 20%
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Pricing Cards */}
-      <section className="section-padding bg-white dark:bg-secondary-900">
+      <section className="py-8 lg:py-12 bg-white dark:bg-secondary-900">
         <div className="container-width">
-          <div className="grid lg:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
             {pricingTiers.map((tier, index) => (
               <Card 
                 key={tier.id} 
-                className={`relative p-8 ${
+                className={`relative h-full flex flex-col group hover:scale-105 opacity-0 ${
                   tier.highlighted 
-                    ? 'ring-2 ring-primary-500 shadow-2xl scale-105' 
-                    : 'hover:shadow-xl hover:-translate-y-1 border-secondary-200 dark:border-secondary-800'
-                } transition-all duration-300 animate-slide-up animation-delay-${index * 100}`}
+                    ? 'ring-2 ring-primary-500 shadow-xl border-primary-200 dark:border-primary-700 bg-gradient-to-br from-primary-50/50 to-white dark:from-primary-900/10 dark:to-secondary-900' 
+                    : 'border-secondary-200 dark:border-secondary-800 hover:border-primary-300 dark:hover:border-primary-700 hover:shadow-lg'
+                } transition-all duration-500 ease-out animate-fade-in-up`}
+                style={{ animationDelay: `${index * 150}ms` }}
+                padding="none"
               >
                 {tier.badge && (
-                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                    <span className={`px-4 py-1 rounded-full text-xs font-semibold ${
+                  <div className="absolute -top-2 left-1/2 transform -translate-x-1/2 z-10">
+                    <span className={`px-2 py-1 rounded-full text-xs font-semibold shadow-sm ${
                       tier.highlighted 
                         ? 'bg-primary-500 text-white' 
                         : 'bg-secondary-100 dark:bg-secondary-800 text-secondary-700 dark:text-secondary-300'
@@ -219,96 +255,112 @@ export default function PricingPage() {
                   </div>
                 )}
 
-                <CardContent>
-                  <div className="text-center mb-8">
-                    <h3 className="text-xl font-semibold mb-2">{tier.name}</h3>
-                    <div className="mb-4">
-                      <span className="text-4xl font-bold">{getPrice(tier)}</span>
+                <div className="p-4 lg:p-5 flex flex-col h-full">
+                  {/* Header */}
+                  <div className="text-center mb-4">
+                    <h3 className="text-lg font-bold mb-2 text-secondary-900 dark:text-secondary-100">{tier.name}</h3>
+                    <div className="mb-3">
+                      <span className="text-3xl lg:text-4xl font-bold text-secondary-900 dark:text-secondary-100">{getPrice(tier)}</span>
                       {tier.id !== 'enterprise' && (
-                        <span className="text-secondary-500 dark:text-secondary-400 ml-1">
+                        <span className="text-secondary-500 dark:text-secondary-400 ml-1 text-sm">
                           {getPeriod(tier)}
                         </span>
                       )}
                     </div>
-                    <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-6">
+                    <p className="text-xs text-secondary-600 dark:text-secondary-400 leading-relaxed">
                       {tier.description}
                     </p>
                   </div>
 
                   {/* Limits */}
-                  <div className="space-y-2 mb-6 p-4 bg-secondary-50 dark:bg-secondary-800 rounded-lg">
-                    <div className="text-sm">
-                      <span className="font-medium text-secondary-900 dark:text-secondary-100">
-                        Includes {tier.limits.tokens}
-                      </span>
-                    </div>
-                    <div className="text-xs text-secondary-600 dark:text-secondary-400">
-                      {tier.limits.messages}
-                    </div>
-                    {tier.limits.integrations && (
-                      <div className="text-xs text-secondary-600 dark:text-secondary-400">
-                        {tier.limits.integrations}
+                  <div className="mb-4 p-3 bg-gradient-to-r from-secondary-50 to-secondary-100 dark:from-secondary-800 dark:to-secondary-800/50 rounded-lg border border-secondary-200 dark:border-secondary-700 min-h-[80px] flex items-center">
+                    <div className="space-y-1 w-full">
+                      <div className="text-xs">
+                        <span className="font-semibold text-secondary-900 dark:text-secondary-100">
+                          Includes {tier.limits.tokens}
+                        </span>
                       </div>
-                    )}
-                    {tier.limits.channels && (
                       <div className="text-xs text-secondary-600 dark:text-secondary-400">
-                        {tier.limits.channels}
+                        {tier.limits.messages}
                       </div>
-                    )}
+                      {tier.limits.integrations && (
+                        <div className="text-xs text-secondary-600 dark:text-secondary-400">
+                          {tier.limits.integrations}
+                        </div>
+                      )}
+                      {tier.limits.channels && (
+                        <div className="text-xs text-secondary-600 dark:text-secondary-400">
+                          {tier.limits.channels}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Features */}
-                  <ul className="space-y-3 mb-8">
-                    {tier.features.map((feature, featureIndex) => (
-                      <li key={featureIndex} className="flex items-start space-x-3">
-                        <svg 
-                          className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
+                  <div className="flex-grow">
+                    <ul className="space-y-2 mb-4">
+                      {tier.features.slice(0, 5).map((feature, featureIndex) => (
+                        <li key={featureIndex} className="flex items-start space-x-2">
+                          <div className={`w-4 h-4 mt-0.5 flex-shrink-0 rounded-full flex items-center justify-center ${
                             feature.included 
-                              ? 'text-green-500' 
-                              : 'text-secondary-300 dark:text-secondary-600'
-                          }`} 
-                          fill="currentColor" 
-                          viewBox="0 0 20 20"
-                        >
-                          {feature.included ? (
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          ) : (
-                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                          )}
-                        </svg>
-                        <span className={`text-sm ${
-                          feature.included 
-                            ? 'text-secondary-700 dark:text-secondary-300' 
-                            : 'text-secondary-400 dark:text-secondary-600 line-through'
-                        }`}>
-                          {feature.text}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
+                              ? 'bg-green-100 dark:bg-green-900/30' 
+                              : 'bg-secondary-100 dark:bg-secondary-800'
+                          }`}>
+                            <svg 
+                              className={`w-2.5 h-2.5 ${
+                                feature.included 
+                                  ? 'text-green-600 dark:text-green-400' 
+                                  : 'text-secondary-400 dark:text-secondary-600'
+                              }`} 
+                              fill="currentColor" 
+                              viewBox="0 0 20 20"
+                            >
+                              {feature.included ? (
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              ) : (
+                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                              )}
+                            </svg>
+                          </div>
+                          <span className={`text-xs leading-relaxed ${
+                            feature.included 
+                              ? 'text-secondary-700 dark:text-secondary-300' 
+                              : 'text-secondary-400 dark:text-secondary-600 line-through'
+                          }`}>
+                            {feature.text}
+                          </span>
+                        </li>
+                      ))}
+                      {tier.features.length > 5 && (
+                        <li className="text-xs text-secondary-500 dark:text-secondary-400 italic">
+                          +{tier.features.length - 5} more features
+                        </li>
+                      )}
+                    </ul>
+                  </div>
 
-                  <Button 
-                    variant={tier.buttonVariant}
-                    className="w-full"
-                    size="lg"
-                  >
-                    {tier.buttonText}
-                  </Button>
-
-                  {tier.id === 'starter' && (
-                    <p className="text-xs text-center text-secondary-500 dark:text-secondary-400 mt-3">
-                      Overage: $1 per extra 1M tokens.
-                    </p>
-                  )}
-                </CardContent>
+                  {/* CTA Button */}
+                  <div className="mt-auto">
+                    <Button 
+                      variant={tier.buttonVariant}
+                      className="w-full font-semibold text-sm"
+                      size="sm"
+                    >
+                      {tier.buttonText}
+                    </Button>
+                  </div>
+                </div>
               </Card>
             ))}
           </div>
 
           {/* Additional Info */}
-          <div className="mt-16 text-center">
-            <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-4">
+          <div className="mt-12 text-center">
+            <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-2">
               All plans include a generous token allowance. Custom SLA available.
+            </p>
+            <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-4 font-medium">
+              Overage: $1 per extra 1M tokens for all plans.
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-sm text-secondary-500 dark:text-secondary-400">
               <div className="flex items-center space-x-1">
@@ -335,9 +387,9 @@ export default function PricingPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="section-padding bg-secondary-50 dark:bg-secondary-950">
+      <section className="section-padding bg-white dark:bg-secondary-900">
         <div className="container-width">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12 animate-slide-up">
               <h2 className="text-3xl lg:text-4xl font-bold mb-4">
                 Frequently Asked Questions
@@ -347,6 +399,57 @@ export default function PricingPage() {
               </p>
             </div>
 
+            {/* AI Assistant */}
+            <Card className="mb-12 p-6 bg-gradient-to-r from-primary-50 to-accent-50 dark:from-primary-900/20 dark:to-accent-900/20 border-primary-200 dark:border-primary-700">
+              <CardContent>
+                <div className="flex items-center space-x-3 mb-4">
+                  <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-accent-500 rounded-full flex items-center justify-center">
+                    <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-secondary-900 dark:text-secondary-100">Ask our AI Assistant</h3>
+                    <p className="text-sm text-secondary-600 dark:text-secondary-400">Get instant answers to your pricing questions</p>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  <div className="flex space-x-3">
+                    <input
+                      type="text"
+                      value={aiQuestion}
+                      onChange={(e) => setAiQuestion(e.target.value)}
+                      placeholder="Ask me anything about our pricing plans..."
+                      className="flex-1 px-4 py-3 border border-secondary-300 dark:border-secondary-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 bg-white dark:bg-secondary-800 text-secondary-900 dark:text-secondary-100"
+                      onKeyPress={(e) => e.key === 'Enter' && handleAiQuestion()}
+                    />
+                    <Button 
+                      onClick={handleAiQuestion}
+                      disabled={isAiLoading || !aiQuestion.trim()}
+                      className="px-6"
+                    >
+                      {isAiLoading ? (
+                        <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      ) : (
+                        'Ask'
+                      )}
+                    </Button>
+                  </div>
+                  
+                  {aiAnswer && (
+                    <div className="p-4 bg-white dark:bg-secondary-800 rounded-lg border border-secondary-200 dark:border-secondary-700">
+                      <p className="text-secondary-700 dark:text-secondary-300 leading-relaxed">{aiAnswer}</p>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Existing FAQs */}
             <div className="space-y-6">
               {faqs.map((faq, index) => (
                 <Card key={index} className={`p-6 animate-slide-up animation-delay-${index * 100}`}>
@@ -377,35 +480,190 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="section-padding bg-gradient-to-br from-primary-600 via-primary-700 to-accent-600 text-white">
-        <div className="container-width text-center">
-          <div className="max-w-4xl mx-auto animate-slide-up">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-6">
-              Ready to Get Started?
+      {/* Plan Comparison Section */}
+      <section className="section-padding bg-secondary-50 dark:bg-secondary-950">
+        <div className="container-width">
+          <div className="text-center mb-12 animate-slide-up">
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+              Compare All Features
             </h2>
-            <p className="text-xl mb-8 text-primary-100 max-w-2xl mx-auto text-balance">
-              Join thousands of businesses already using Zauren AI agents. Start your free trial today.
+            <p className="text-lg text-secondary-600 dark:text-secondary-400">
+              Choose the plan that's right for your business needs.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                size="lg" 
-                variant="secondary"
-                className="text-lg px-8 py-4 bg-white text-primary-700 hover:bg-secondary-50"
-              >
-                Start Free Trial
-              </Button>
-              <Button 
-                size="lg" 
-                variant="outline"
-                className="text-lg px-8 py-4 border-white text-white hover:bg-white hover:text-primary-700"
-              >
-                Contact Sales
-              </Button>
-            </div>
-            <p className="text-sm text-primary-200 mt-4">
-              No credit card required • 14-day free trial • Cancel anytime
-            </p>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full bg-white dark:bg-secondary-900 rounded-xl shadow-lg">
+              <thead>
+                <tr className="border-b border-secondary-200 dark:border-secondary-700">
+                  <th className="text-left p-6 font-semibold text-secondary-900 dark:text-secondary-100">Features</th>
+                  <th className="text-center p-6 font-semibold text-secondary-900 dark:text-secondary-100">Starter</th>
+                  <th className="text-center p-6 font-semibold text-secondary-900 dark:text-secondary-100 bg-primary-50 dark:bg-primary-900/20">Professional</th>
+                  <th className="text-center p-6 font-semibold text-secondary-900 dark:text-secondary-100">Growth</th>
+                  <th className="text-center p-6 font-semibold text-secondary-900 dark:text-secondary-100">Enterprise</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b border-secondary-100 dark:border-secondary-800">
+                  <td className="p-6 text-secondary-700 dark:text-secondary-300">Monthly Price</td>
+                  <td className="p-6 text-center font-bold text-secondary-900 dark:text-secondary-100">$19</td>
+                  <td className="p-6 text-center font-bold text-secondary-900 dark:text-secondary-100 bg-primary-50 dark:bg-primary-900/20">$49</td>
+                  <td className="p-6 text-center font-bold text-secondary-900 dark:text-secondary-100">$149</td>
+                  <td className="p-6 text-center font-bold text-secondary-900 dark:text-secondary-100">Custom</td>
+                </tr>
+                <tr className="border-b border-secondary-100 dark:border-secondary-800">
+                  <td className="p-6 text-secondary-700 dark:text-secondary-300">API Integrations</td>
+                  <td className="p-6 text-center">
+                    <span className="text-secondary-600 dark:text-secondary-400">1</span>
+                  </td>
+                  <td className="p-6 text-center bg-primary-50 dark:bg-primary-900/20">
+                    <span className="text-secondary-600 dark:text-secondary-400">3</span>
+                  </td>
+                  <td className="p-6 text-center">
+                    <span className="text-secondary-600 dark:text-secondary-400">6</span>
+                  </td>
+                  <td className="p-6 text-center">
+                    <span className="text-secondary-600 dark:text-secondary-400">Unlimited</span>
+                  </td>
+                </tr>
+                <tr className="border-b border-secondary-100 dark:border-secondary-800">
+                  <td className="p-6 text-secondary-700 dark:text-secondary-300">24/7 AI Support</td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center bg-primary-50 dark:bg-primary-900/20">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                </tr>
+                <tr className="border-b border-secondary-100 dark:border-secondary-800">
+                  <td className="p-6 text-secondary-700 dark:text-secondary-300">Cart & Inventory Sync</td>
+                  <td className="p-6 text-center">
+                    <span className="text-secondary-500 text-sm">Basic</span>
+                  </td>
+                  <td className="p-6 text-center bg-primary-50 dark:bg-primary-900/20">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                </tr>
+                <tr className="border-b border-secondary-100 dark:border-secondary-800">
+                  <td className="p-6 text-secondary-700 dark:text-secondary-300">Order & Fulfillment Automation</td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-red-400 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center bg-primary-50 dark:bg-primary-900/20">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                </tr>
+                <tr className="border-b border-secondary-100 dark:border-secondary-800">
+                  <td className="p-6 text-secondary-700 dark:text-secondary-300">AI-driven Sales Recommendations</td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-red-400 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center bg-primary-50 dark:bg-primary-900/20">
+                    <svg className="w-5 h-5 text-red-400 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                </tr>
+                <tr className="border-b border-secondary-100 dark:border-secondary-800">
+                  <td className="p-6 text-secondary-700 dark:text-secondary-300">Custom Workflows</td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-red-400 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center bg-primary-50 dark:bg-primary-900/20">
+                    <svg className="w-5 h-5 text-red-400 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="p-6 text-secondary-700 dark:text-secondary-300">SLA Guarantee</td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-red-400 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center bg-primary-50 dark:bg-primary-900/20">
+                    <svg className="w-5 h-5 text-red-400 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-red-400 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                  <td className="p-6 text-center">
+                    <svg className="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
