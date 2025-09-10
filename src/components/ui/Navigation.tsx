@@ -4,9 +4,8 @@ import * as React from 'react'
 import Link from 'next/link'
 import { cn } from '@/utils'
 import { Button } from './Button'
-import { useAuth } from '@/hooks/useAuth'
+import { UserNavigation } from './UserNavigation'
 import type { NavItem } from '@/types'
-import { LogOut, User } from 'lucide-react'
 
 interface NavigationProps {
   items: NavItem[]
@@ -19,23 +18,18 @@ export function Navigation({ items, logo, logoText = 'Zauren', className }: Navi
   const [isOpen, setIsOpen] = React.useState(false)
   const [isDark, setIsDark] = React.useState(false)
   const [isScrolled, setIsScrolled] = React.useState(false)
-  const [showUserMenu, setShowUserMenu] = React.useState(false)
-  const { user, loading, signOut } = useAuth()
 
   // Click outside handler for user menu
-  const userMenuRef = React.useRef<HTMLDivElement>(null)
   React.useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
-        setShowUserMenu(false)
-      }
+    if (isOpen) {
+      document.addEventListener('mousedown', (event) => {
+        const nav = document.querySelector('nav');
+        if (nav && !nav.contains(event.target as Node)) {
+          setIsOpen(false);
+        }
+      });
     }
-
-    if (showUserMenu) {
-      document.addEventListener('mousedown', handleClickOutside)
-      return () => document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [showUserMenu])
+  }, [isOpen]);
 
   // Scroll detection with debouncing and hysteresis
   React.useEffect(() => {
@@ -71,9 +65,15 @@ export function Navigation({ items, logo, logoText = 'Zauren', className }: Navi
 
   // Theme detection and toggle
   React.useEffect(() => {
-    // Sync state with current theme
-    const isDarkMode = document.documentElement.classList.contains('dark')
+    const isDarkMode = document.documentElement.classList.contains('dark') ||
+      (!document.documentElement.classList.contains('light') && 
+       window.matchMedia('(prefers-color-scheme: dark)').matches)
+    
     setIsDark(isDarkMode)
+    
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark')
+    }
   }, [])
 
   const toggleTheme = () => {
@@ -83,17 +83,10 @@ export function Navigation({ items, logo, logoText = 'Zauren', className }: Navi
     if (newIsDark) {
       document.documentElement.classList.add('dark')
       document.documentElement.classList.remove('light')
-      localStorage.setItem('theme', 'dark')
     } else {
       document.documentElement.classList.add('light')
       document.documentElement.classList.remove('dark')
-      localStorage.setItem('theme', 'light')
     }
-  }
-
-  const handleSignOut = async () => {
-    await signOut()
-    setShowUserMenu(false)
   }
 
   return (
@@ -160,86 +153,8 @@ export function Navigation({ items, logo, logoText = 'Zauren', className }: Navi
               )}
             </Button>
 
-            {/* Authentication buttons/user menu */}
-            {loading ? (
-              <div className="w-24 h-10 bg-secondary-200 dark:bg-secondary-700 rounded-lg animate-pulse" />
-            ) : user ? (
-              <div className="relative" ref={userMenuRef}>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                  className={cn(
-                    'flex items-center space-x-2 transition-all duration-300',
-                    isScrolled ? 'text-sm px-3 py-2' : 'text-base px-4 py-2.5'
-                  )}
-                >
-                  <User className={cn('transition-all duration-300', isScrolled ? 'h-4 w-4' : 'h-5 w-5')} />
-                  <span className="hidden sm:block">{user.user_metadata?.full_name || user.email}</span>
-                </Button>
-                
-                {showUserMenu && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-secondary-800 rounded-lg shadow-lg border border-secondary-200 dark:border-secondary-700 py-2 z-50">
-                    <div className="px-4 py-2 border-b border-secondary-200 dark:border-secondary-700">
-                      <p className="text-sm font-medium text-secondary-900 dark:text-secondary-100">
-                        {user.user_metadata?.full_name || 'User'}
-                      </p>
-                      <p className="text-xs text-secondary-500 dark:text-secondary-400">
-                        {user.email}
-                      </p>
-                    </div>
-                    <Link
-                      href="/dashboard"
-                      className="block px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-700"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/profile"
-                      className="block px-4 py-2 text-sm text-secondary-700 dark:text-secondary-300 hover:bg-secondary-100 dark:hover:bg-secondary-700"
-                      onClick={() => setShowUserMenu(false)}
-                    >
-                      Profile
-                    </Link>
-                    <button
-                      onClick={handleSignOut}
-                      className="w-full text-left px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-secondary-100 dark:hover:bg-secondary-700 flex items-center space-x-2"
-                    >
-                      <LogOut className="h-4 w-4" />
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex items-center space-x-3">
-                <Link href="/auth/signin">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className={cn(
-                      'transition-all duration-300',
-                      isScrolled ? 'text-sm px-3 py-2' : 'text-base px-4 py-2.5'
-                    )}
-                  >
-                    Sign In
-                  </Button>
-                </Link>
-                <Link href="/auth/signup">
-                  <Button 
-                    variant="primary" 
-                    size="sm"
-                    className={cn(
-                      'transition-all duration-300',
-                      isScrolled ? 'text-sm px-4 py-2' : 'text-base px-6 py-2.5'
-                    )}
-                  >
-                    Get Started
-                  </Button>
-                </Link>
-              </div>
-            )}
+            {/* Authentication - Desktop */}
+            <UserNavigation isScrolled={isScrolled} />
           </div>
 
           {/* Mobile menu button */}
@@ -303,57 +218,8 @@ export function Navigation({ items, logo, logoText = 'Zauren', className }: Navi
                 </Link>
               ))}
               <div className="pt-3 px-4 space-y-2">
-                {loading ? (
-                  <div className="w-full h-10 bg-secondary-200 dark:bg-secondary-700 rounded-lg animate-pulse" />
-                ) : user ? (
-                  <>
-                    <div className="mb-3 pb-3 border-b border-secondary-200 dark:border-secondary-700">
-                      <p className="text-sm font-medium text-secondary-900 dark:text-secondary-100">
-                        {user.user_metadata?.full_name || 'User'}
-                      </p>
-                      <p className="text-xs text-secondary-500 dark:text-secondary-400">
-                        {user.email}
-                      </p>
-                    </div>
-                    <Link
-                      href="/dashboard"
-                      className="block w-full text-left px-4 py-3 text-base font-medium text-secondary-600 hover:text-primary-600 dark:text-secondary-300 dark:hover:text-primary-400 transition-colors duration-200 rounded-lg hover:bg-secondary-100 dark:hover:bg-secondary-800"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Dashboard
-                    </Link>
-                    <Link
-                      href="/profile"
-                      className="block w-full text-left px-4 py-3 text-base font-medium text-secondary-600 hover:text-primary-600 dark:text-secondary-300 dark:hover:text-primary-400 transition-colors duration-200 rounded-lg hover:bg-secondary-100 dark:hover:bg-secondary-800"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      Profile
-                    </Link>
-                    <button
-                      onClick={() => {
-                        handleSignOut()
-                        setIsOpen(false)
-                      }}
-                      className="w-full text-left px-4 py-3 text-base font-medium text-red-600 dark:text-red-400 transition-colors duration-200 rounded-lg hover:bg-secondary-100 dark:hover:bg-secondary-800 flex items-center space-x-2"
-                    >
-                      <LogOut className="h-5 w-5" />
-                      <span>Sign Out</span>
-                    </button>
-                  </>
-                ) : (
-                  <>
-                    <Link href="/auth/signin" onClick={() => setIsOpen(false)}>
-                      <Button variant="ghost" size="sm" className="w-full justify-center">
-                        Sign In
-                      </Button>
-                    </Link>
-                    <Link href="/auth/signup" onClick={() => setIsOpen(false)}>
-                      <Button variant="primary" size="sm" className="w-full">
-                        Get Started
-                      </Button>
-                    </Link>
-                  </>
-                )}
+                {/* Authentication - Mobile */}
+                <UserNavigation isScrolled={false} isMobile={true} />
               </div>
             </div>
           </div>

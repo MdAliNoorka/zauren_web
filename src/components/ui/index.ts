@@ -8,6 +8,7 @@ export { Input } from './Input'
 export type { InputProps } from './Input'
 
 export { Navigation } from './Navigation'
+export { UserNavigation } from './UserNavigation'
 
 export { RealTimeAnalytics } from './RealTimeAnalytics'
 export { CompactAnalytics } from './CompactAnalytics'

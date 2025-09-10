@@ -14,7 +14,12 @@ export default function SignUpPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-block">
-            <span className="text-3xl font-bold gradient-text">Zauren</span>
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center mr-3">
+                <span className="text-white font-bold text-lg">Z</span>
+              </div>
+              <span className="text-3xl font-semibold font-mono gradient-text">Zauren</span>
+            </div>
           </Link>
         </div>
 
@@ -25,7 +30,7 @@ export default function SignUpPage() {
         <div className="mt-8 text-center space-y-2">
           <Link
             href="/"
-            className="text-sm text-secondary-600 hover:text-primary-600 dark:text-secondary-400 dark:hover:text-primary-400"
+            className="text-sm text-secondary-600 hover:text-primary-600 dark:text-secondary-400 dark:hover:text-primary-400 font-mono transition-colors"
           >
             ← Back to Home
           </Link>

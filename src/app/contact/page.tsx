@@ -10,8 +10,8 @@ import type { NavItem, ContactFormData } from '@/types'
 const navItems: NavItem[] = [
   { label: 'Features', href: '/#features' },
   { label: 'Pricing', href: '/pricing' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Contact', href: '/contact' },
-  { label: 'About', href: '/#about' },
 ]
 
 const contactMethods = [
@@ -56,18 +56,37 @@ export default function ContactPage() {
     e.preventDefault()
     setIsSubmitting(true)
 
-    // Simulate form submission
-    setTimeout(() => {
-      setIsSubmitting(false)
-      setSubmitSuccess(true)
-      setFormData({
-        name: '',
-        email: '',
-        company: '',
-        subject: '',
-        message: '',
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/contact-form`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+        },
+        body: JSON.stringify(formData),
       })
-    }, 2000)
+
+      const data = await response.json()
+
+      if (response.ok && data.success) {
+        setSubmitSuccess(true)
+        setFormData({
+          name: '',
+          email: '',
+          company: '',
+          subject: '',
+          message: '',
+        })
+      } else {
+        throw new Error(data.error || 'Failed to submit form')
+      }
+    } catch (error) {
+      console.error('Form submission error:', error)
+      // You could show an error message to the user here
+      alert('There was an error submitting your message. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -92,14 +111,23 @@ export default function ContactPage() {
 
       {/* Header */}
       <section className="section-padding pt-32 lg:pt-40 bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950">
-        <div className="container-width text-center">
+        {/* Tech Grid Overlay */}
+        <div className="absolute inset-0 opacity-3 dark:opacity-5">
+          <div className="grid grid-cols-8 grid-rows-8 h-full w-full">
+            {Array.from({ length: 64 }).map((_, i) => (
+              <div key={i} className="border border-primary-600/10 dark:border-primary-400/10"></div>
+            ))}
+          </div>
+        </div>
+        
+        <div className="container-width text-center relative z-10">
           <div className="max-w-3xl mx-auto space-y-8 animate-slide-up">
             <div className="space-y-4">
-              <div className="inline-flex items-center px-4 py-2 bg-primary-100 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-full text-sm font-medium">
+              <div className="inline-flex items-center px-4 py-2 bg-primary-100 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-full text-sm font-mono">
                 📞 Get in Touch
               </div>
-              <h1 className="text-4xl lg:text-6xl font-bold text-balance leading-tight">
-                Let's <span className="gradient-text">Connect</span>
+              <h1 className="text-4xl lg:text-6xl font-semibold font-mono text-balance leading-tight text-secondary-900 dark:text-white">
+                Let's <span className="bg-gradient-to-r from-primary-600 via-accent-500 to-primary-700 bg-clip-text text-transparent">Connect</span>
               </h1>
               <p className="text-xl text-secondary-600 dark:text-secondary-400 max-w-2xl mx-auto text-balance">
                 Have questions about Zauren? Want to see a demo? Our team is here to help you transform your customer service.
@@ -124,7 +152,7 @@ export default function ContactPage() {
                   <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center mx-auto mb-4 text-white">
                     {method.icon}
                   </div>
-                  <h3 className="text-lg font-semibold mb-2">{method.title}</h3>
+                  <h3 className="text-lg font-semibold font-mono mb-2 text-secondary-900 dark:text-white">{method.title}</h3>
                   <p className="text-sm text-secondary-600 dark:text-secondary-400 mb-4">
                     {method.description}
                   </p>
@@ -162,7 +190,7 @@ export default function ContactPage() {
             {/* Contact Form */}
             <div className="animate-slide-up">
               <div className="mb-8 text-center">
-                <h2 className="text-3xl font-bold mb-4">Send us a message</h2>
+                <h2 className="text-3xl font-semibold font-mono mb-4 text-secondary-900 dark:text-white">Send us a message</h2>
                 <p className="text-secondary-600 dark:text-secondary-400">
                   Fill out the form below and we'll get back to you as soon as possible.
                 </p>
@@ -269,7 +297,7 @@ export default function ContactPage() {
       <section className="section-padding bg-white dark:bg-secondary-900">
         <div className="container-width">
           <div className="text-center mb-12 animate-slide-up">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">
+            <h2 className="text-3xl lg:text-4xl font-semibold font-mono mb-4 text-secondary-900 dark:text-white">
               Frequently Asked Questions
             </h2>
             <p className="text-lg text-secondary-600 dark:text-secondary-400 max-w-2xl mx-auto">
@@ -321,7 +349,7 @@ export default function ContactPage() {
       <section className="section-padding bg-gradient-to-br from-primary-600 via-primary-700 to-accent-600 text-white">
         <div className="container-width text-center">
           <div className="max-w-4xl mx-auto animate-slide-up">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-6">
+            <h2 className="text-3xl lg:text-4xl font-semibold font-mono mb-6 text-white">
               Ready to Transform Your Customer Service?
             </h2>
             <p className="text-xl mb-8 text-primary-100 max-w-2xl mx-auto text-balance">

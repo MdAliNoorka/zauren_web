@@ -6,14 +6,17 @@ import { Card, CardContent } from '@/components/ui/Card'
 import { InteractiveChat } from '@/components/ui/InteractiveChat'
 import { DynamicPlatforms } from '@/components/ui/DynamicPlatforms'
 import { AnimatedStatsSimple } from '@/components/ui/AnimatedStatsSimple'
+import { useAuth } from '@/hooks/useAuth'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import Link from 'next/link'
 
 // Navigation items
 const navItems = [
   { label: 'Features', href: '#features' },
   { label: 'Pricing', href: '/pricing' },
+  { label: 'Blog', href: '/blog' },
   { label: 'Contact', href: '/contact' },
-  { label: 'Dashboard', href: '/dashboard' },
 ]
 
 // Features data
@@ -75,6 +78,32 @@ const features = [
 ]
 
 export default function HomePage() {
+  const { isAuthenticated, loading } = useAuth()
+  const router = useRouter()
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      router.push('/dashboard')
+    }
+  }, [isAuthenticated, loading, router])
+
+  // Show loading while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white dark:bg-secondary-950 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-secondary-600 dark:text-secondary-400">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Only show home page if user is not authenticated
+  if (isAuthenticated) {
+    return null // Will be redirected to dashboard
+  }
   return (
     <main className="min-h-screen bg-white dark:bg-secondary-950" style={{zoom: '0.9'}}>
       {/* Global Smooth Scrolling Styles */}

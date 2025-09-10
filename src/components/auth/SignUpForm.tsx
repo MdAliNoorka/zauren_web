@@ -62,22 +62,48 @@ export function SignUpForm({ className, onSuccess, redirectTo = '/' }: SignUpFor
     setError(null)
 
     try {
-      const { error } = await supabase.auth.signUp({
+      console.log('🎯 Signing up with NEW PROJECT...')
+      
+      // Signup with user metadata for the trigger
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback?redirect=/dashboard`,
           data: {
             full_name: data.name,
-          },
-        },
+            terms_accepted: data.acceptTerms,
+            terms_accepted_at: new Date().toISOString()
+          }
+        }
       })
 
-      if (error) throw error
+      console.log('✅ Signup response:', { authData, authError })
 
-      setSuccess(true)
-      // Note: User will need to confirm email before they can sign in
+      if (authError) {
+        console.error('❌ Auth error:', authError)
+        setError(authError.message)
+        return
+      }
+
+      if (authData.user) {
+        console.log('🎉 User created in new project:', authData.user.id)
+        
+        // The trigger should handle profile creation automatically
+        if (authData.session) {
+          // User is logged in immediately
+          console.log('✅ User has session, redirecting...')
+          onSuccess?.()
+          router.push(redirectTo)
+        } else {
+          // Email confirmation required
+          console.log('📧 Email confirmation required - check your email!')
+          setSuccess(true)
+        }
+      }
     } catch (error: any) {
-      setError(error.message)
+      console.error('❌ Sign up error:', error)
+      setError(`Sign up failed: ${error.message || 'Unknown error'}`)
     } finally {
       setIsLoading(false)
     }
@@ -85,14 +111,14 @@ export function SignUpForm({ className, onSuccess, redirectTo = '/' }: SignUpFor
 
   if (success) {
     return (
-      <Card className={cn('p-8 max-w-md w-full mx-auto text-center', className)}>
+      <Card className={cn('p-8 max-w-md w-full mx-auto text-center backdrop-blur-sm bg-white/90 dark:bg-secondary-900/90 border border-white/20 dark:border-secondary-800/30 shadow-2xl', className)}>
         <div className="mb-6">
           <div className="w-16 h-16 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold gradient-text mb-2">Check Your Email</h1>
+          <h1 className="text-2xl font-semibold font-mono gradient-text mb-2">Check Your Email</h1>
           <p className="text-secondary-600 dark:text-secondary-400">
             We've sent you a confirmation link. Please check your email and click the link to activate your account.
           </p>
@@ -101,7 +127,7 @@ export function SignUpForm({ className, onSuccess, redirectTo = '/' }: SignUpFor
         <Button
           variant="primary"
           size="lg"
-          className="w-full"
+          className="w-full font-mono transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           onClick={() => router.push('/auth/signin')}
         >
           Continue to Sign In
@@ -111,9 +137,14 @@ export function SignUpForm({ className, onSuccess, redirectTo = '/' }: SignUpFor
   }
 
   return (
-    <Card className={cn('p-8 max-w-md w-full mx-auto', className)}>
+    <Card className={cn('p-8 max-w-md w-full mx-auto backdrop-blur-sm bg-white/90 dark:bg-secondary-900/90 border border-white/20 dark:border-secondary-800/30 shadow-2xl', className)}>
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold gradient-text mb-2">Create Account</h1>
+        <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+          </svg>
+        </div>
+        <h1 className="text-3xl font-semibold font-mono gradient-text mb-2">Create Account</h1>
         <p className="text-secondary-600 dark:text-secondary-400">
           Join Zauren and transform your customer service
         </p>
@@ -121,13 +152,13 @@ export function SignUpForm({ className, onSuccess, redirectTo = '/' }: SignUpFor
 
       {error && (
         <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-          <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+          <p className="text-red-600 dark:text-red-400 text-sm font-mono">{error}</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium mb-2 text-secondary-700 dark:text-secondary-300">
+          <label className="block text-sm font-mono font-medium mb-2 text-secondary-700 dark:text-secondary-300">
             Full Name
           </label>
           <div className="relative">
@@ -136,19 +167,19 @@ export function SignUpForm({ className, onSuccess, redirectTo = '/' }: SignUpFor
               {...register('name')}
               type="text"
               placeholder="Enter your full name"
-              className="pl-10"
+              className="pl-10 font-mono text-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
               disabled={isLoading}
             />
           </div>
           {errors.name && (
-            <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 font-mono">
               {errors.name.message}
             </p>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2 text-secondary-700 dark:text-secondary-300">
+          <label className="block text-sm font-mono font-medium mb-2 text-secondary-700 dark:text-secondary-300">
             Email Address
           </label>
           <div className="relative">
@@ -157,19 +188,19 @@ export function SignUpForm({ className, onSuccess, redirectTo = '/' }: SignUpFor
               {...register('email')}
               type="email"
               placeholder="Enter your email"
-              className="pl-10"
+              className="pl-10 font-mono text-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
               disabled={isLoading}
             />
           </div>
           {errors.email && (
-            <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 font-mono">
               {errors.email.message}
             </p>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2 text-secondary-700 dark:text-secondary-300">
+          <label className="block text-sm font-mono font-medium mb-2 text-secondary-700 dark:text-secondary-300">
             Password
           </label>
           <div className="relative">
@@ -178,26 +209,26 @@ export function SignUpForm({ className, onSuccess, redirectTo = '/' }: SignUpFor
               {...register('password')}
               type={showPassword ? 'text' : 'password'}
               placeholder="Create a password"
-              className="pl-10 pr-12"
+              className="pl-10 pr-12 font-mono text-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
               disabled={isLoading}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary-400 hover:text-secondary-600 dark:hover:text-secondary-300"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary-400 hover:text-secondary-600 dark:hover:text-secondary-300 transition-colors"
             >
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
           {errors.password && (
-            <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 font-mono">
               {errors.password.message}
             </p>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2 text-secondary-700 dark:text-secondary-300">
+          <label className="block text-sm font-mono font-medium mb-2 text-secondary-700 dark:text-secondary-300">
             Confirm Password
           </label>
           <div className="relative">
@@ -206,20 +237,47 @@ export function SignUpForm({ className, onSuccess, redirectTo = '/' }: SignUpFor
               {...register('confirmPassword')}
               type={showConfirmPassword ? 'text' : 'password'}
               placeholder="Confirm your password"
-              className="pl-10 pr-12"
+              className="pl-10 pr-12 font-mono text-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
               disabled={isLoading}
             />
             <button
               type="button"
               onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary-400 hover:text-secondary-600 dark:hover:text-secondary-300"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary-400 hover:text-secondary-600 dark:hover:text-secondary-300 transition-colors"
             >
               {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
           {errors.confirmPassword && (
-            <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 font-mono">
               {errors.confirmPassword.message}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <div className="flex items-start">
+            <input
+              {...register('acceptTerms')}
+              type="checkbox"
+              id="acceptTerms"
+              className="mt-1 h-4 w-4 text-primary-600 border-secondary-300 rounded focus:ring-primary-500 dark:border-secondary-600 dark:bg-secondary-700"
+              disabled={isLoading}
+            />
+            <label htmlFor="acceptTerms" className="ml-3 block text-sm text-secondary-700 dark:text-secondary-300 font-mono">
+              I agree to the{' '}
+              <Link href="/terms" className="text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 underline">
+                Terms of Service
+              </Link>
+              {' '}and{' '}
+              <Link href="/privacy" className="text-primary-600 hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300 underline">
+                Privacy Policy
+              </Link>
+            </label>
+          </div>
+          {errors.acceptTerms && (
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 font-mono">
+              {errors.acceptTerms.message}
             </p>
           )}
         </div>
@@ -228,10 +286,17 @@ export function SignUpForm({ className, onSuccess, redirectTo = '/' }: SignUpFor
           type="submit"
           variant="primary"
           size="lg"
-          className="w-full"
+          className="w-full font-mono transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           disabled={isLoading}
         >
-          {isLoading ? 'Creating Account...' : 'Create Account'}
+          {isLoading ? (
+            <div className="flex items-center">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              Creating Account...
+            </div>
+          ) : (
+            'Create Account'
+          )}
         </Button>
 
         <div className="relative">
@@ -239,7 +304,7 @@ export function SignUpForm({ className, onSuccess, redirectTo = '/' }: SignUpFor
             <div className="w-full border-t border-secondary-300 dark:border-secondary-600" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white dark:bg-secondary-900 text-secondary-500">
+            <span className="px-2 bg-white dark:bg-secondary-900 text-secondary-500 font-mono">
               Or continue with
             </span>
           </div>
@@ -249,7 +314,7 @@ export function SignUpForm({ className, onSuccess, redirectTo = '/' }: SignUpFor
           type="button"
           variant="outline"
           size="lg"
-          className="w-full"
+          className="w-full font-mono transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] hover:bg-primary-50 dark:hover:bg-primary-900/20"
           onClick={signUpWithGoogle}
           disabled={isLoading}
         >
@@ -276,11 +341,11 @@ export function SignUpForm({ className, onSuccess, redirectTo = '/' }: SignUpFor
       </form>
 
       <div className="mt-8 text-center">
-        <p className="text-secondary-600 dark:text-secondary-400">
+        <p className="text-secondary-600 dark:text-secondary-400 font-mono text-sm">
           Already have an account?{' '}
           <Link
             href="/auth/signin"
-            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
+            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium transition-colors"
           >
             Sign in
           </Link>

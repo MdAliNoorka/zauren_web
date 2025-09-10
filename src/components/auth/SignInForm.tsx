@@ -60,26 +60,44 @@ export function SignInForm({ className, onSuccess, redirectTo = '/' }: SignInFor
     setError(null)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log('🔐 Signing in with new project...')
+      
+      // Use direct Supabase auth for reliability
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: data.email,
         password: data.password,
       })
 
-      if (error) throw error
+      console.log('✅ Sign in response:', { authData, authError })
 
-      onSuccess?.()
-      router.push(redirectTo)
+      if (authError) {
+        console.error('❌ Sign in error:', authError)
+        setError(authError.message)
+        return
+      }
+
+      if (authData.session) {
+        console.log('🎉 User signed in successfully:', authData.session.user.id)
+        onSuccess?.()
+        router.push(redirectTo === '/' ? '/dashboard' : redirectTo)
+      }
     } catch (error: any) {
-      setError(error.message)
+      console.error('❌ Sign in error:', error)
+      setError('An unexpected error occurred. Please try again.')
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <Card className={cn('p-8 max-w-md w-full mx-auto', className)}>
+    <Card className={cn('p-8 max-w-md w-full mx-auto backdrop-blur-sm bg-white/90 dark:bg-secondary-900/90 border border-white/20 dark:border-secondary-800/30 shadow-2xl', className)}>
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold gradient-text mb-2">Welcome Back</h1>
+        <div className="w-16 h-16 bg-gradient-to-br from-primary-500 to-accent-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+        </div>
+        <h1 className="text-3xl font-semibold font-mono gradient-text mb-2">Welcome Back</h1>
         <p className="text-secondary-600 dark:text-secondary-400">
           Sign in to your Zauren account
         </p>
@@ -93,7 +111,7 @@ export function SignInForm({ className, onSuccess, redirectTo = '/' }: SignInFor
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <div>
-          <label className="block text-sm font-medium mb-2 text-secondary-700 dark:text-secondary-300">
+          <label className="block text-sm font-mono font-medium mb-2 text-secondary-700 dark:text-secondary-300">
             Email Address
           </label>
           <div className="relative">
@@ -102,19 +120,19 @@ export function SignInForm({ className, onSuccess, redirectTo = '/' }: SignInFor
               {...register('email')}
               type="email"
               placeholder="Enter your email"
-              className="pl-10"
+              className="pl-10 font-mono text-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
               disabled={isLoading}
             />
           </div>
           {errors.email && (
-            <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 font-mono">
               {errors.email.message}
             </p>
           )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2 text-secondary-700 dark:text-secondary-300">
+          <label className="block text-sm font-mono font-medium mb-2 text-secondary-700 dark:text-secondary-300">
             Password
           </label>
           <div className="relative">
@@ -123,28 +141,40 @@ export function SignInForm({ className, onSuccess, redirectTo = '/' }: SignInFor
               {...register('password')}
               type={showPassword ? 'text' : 'password'}
               placeholder="Enter your password"
-              className="pl-10 pr-12"
+              className="pl-10 pr-12 font-mono text-sm transition-all duration-200 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500"
               disabled={isLoading}
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary-400 hover:text-secondary-600 dark:hover:text-secondary-300"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-secondary-400 hover:text-secondary-600 dark:hover:text-secondary-300 transition-colors"
             >
               {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
             </button>
           </div>
           {errors.password && (
-            <p className="mt-2 text-sm text-red-600 dark:text-red-400">
+            <p className="mt-2 text-sm text-red-600 dark:text-red-400 font-mono">
               {errors.password.message}
             </p>
           )}
         </div>
 
         <div className="flex items-center justify-between">
+          <div className="flex items-center">
+            <input
+              {...register('rememberMe')}
+              type="checkbox"
+              id="rememberMe"
+              className="h-4 w-4 text-primary-600 border-secondary-300 rounded focus:ring-primary-500 dark:border-secondary-600 dark:bg-secondary-700"
+              disabled={isLoading}
+            />
+            <label htmlFor="rememberMe" className="ml-2 block text-sm text-secondary-700 dark:text-secondary-300 font-mono">
+              Remember me
+            </label>
+          </div>
           <Link
             href="/auth/forgot-password"
-            className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
+            className="text-sm text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-mono transition-colors"
           >
             Forgot your password?
           </Link>
@@ -154,10 +184,17 @@ export function SignInForm({ className, onSuccess, redirectTo = '/' }: SignInFor
           type="submit"
           variant="primary"
           size="lg"
-          className="w-full"
+          className="w-full font-mono transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           disabled={isLoading}
         >
-          {isLoading ? 'Signing In...' : 'Sign In'}
+          {isLoading ? (
+            <div className="flex items-center">
+              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+              Signing In...
+            </div>
+          ) : (
+            'Sign In'
+          )}
         </Button>
 
         <div className="relative">
@@ -165,7 +202,7 @@ export function SignInForm({ className, onSuccess, redirectTo = '/' }: SignInFor
             <div className="w-full border-t border-secondary-300 dark:border-secondary-600" />
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white dark:bg-secondary-900 text-secondary-500">
+            <span className="px-2 bg-white dark:bg-secondary-900 text-secondary-500 font-mono">
               Or continue with
             </span>
           </div>
@@ -175,7 +212,7 @@ export function SignInForm({ className, onSuccess, redirectTo = '/' }: SignInFor
           type="button"
           variant="outline"
           size="lg"
-          className="w-full"
+          className="w-full font-mono transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] hover:bg-primary-50 dark:hover:bg-primary-900/20"
           onClick={signInWithGoogle}
           disabled={isLoading}
         >
@@ -202,11 +239,11 @@ export function SignInForm({ className, onSuccess, redirectTo = '/' }: SignInFor
       </form>
 
       <div className="mt-8 text-center">
-        <p className="text-secondary-600 dark:text-secondary-400">
+        <p className="text-secondary-600 dark:text-secondary-400 font-mono text-sm">
           Don't have an account?{' '}
           <Link
             href="/auth/signup"
-            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium"
+            className="text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 font-medium transition-colors"
           >
             Sign up
           </Link>

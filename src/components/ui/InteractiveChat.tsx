@@ -77,6 +77,7 @@ export function InteractiveChat() {
       timestamp: new Date()
     }
 
+    const currentInput = inputText
     setMessages(prev => [...prev, userMessage])
     setInputText('')
     setIsTyping(true)
@@ -88,22 +89,27 @@ export function InteractiveChat() {
 
     try {
       // Simulate typing delay
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
-      const response = await fetch('/api/chat', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/ai-chat-enhanced`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
         },
-        body: JSON.stringify({ message: inputText }),
+        body: JSON.stringify({ 
+          message: currentInput,
+          sessionId: `demo_${Date.now()}`,
+          userId: 'demo_user'
+        }),
       })
 
       const data = await response.json()
       
-      // Calculate response time
+      // Calculate response time (including our delay)
       const endTime = Date.now()
-      const responseTimeMs = endTime - startTime
-      setResponseTime(responseTimeMs)
+      const totalResponseTime = endTime - startTime
+      setResponseTime(data.responseTime || totalResponseTime)
       
       if (response.ok) {
         const aiMessage: Message = {
