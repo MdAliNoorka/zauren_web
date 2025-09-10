@@ -295,31 +295,31 @@ export function DynamicPlatforms() {
           </div>
         </div>
 
-        {/* Stats overlay */}
+        {/* Stats overlay - Startup appropriate */}
         <div className="mt-8 grid grid-cols-2 lg:grid-cols-4 gap-4 max-w-4xl mx-auto">
           <div className="text-center p-4 bg-white/10 dark:bg-secondary-800/20 backdrop-blur-sm rounded-xl border border-white/20 dark:border-secondary-700/30">
             <div className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-              {platforms.length}
+              {platforms.length}+
             </div>
             <div className="text-xs text-secondary-600 dark:text-secondary-400 font-mono">PLATFORMS</div>
           </div>
           <div className="text-center p-4 bg-white/10 dark:bg-secondary-800/20 backdrop-blur-sm rounded-xl border border-white/20 dark:border-secondary-700/30">
             <div className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-              99.9%
+              2025
             </div>
-            <div className="text-xs text-secondary-600 dark:text-secondary-400 font-mono">UPTIME</div>
+            <div className="text-xs text-secondary-600 dark:text-secondary-400 font-mono">FOUNDED</div>
           </div>
           <div className="text-center p-4 bg-white/10 dark:bg-secondary-800/20 backdrop-blur-sm rounded-xl border border-white/20 dark:border-secondary-700/30">
             <div className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
-              &lt;100ms
+              FAST
             </div>
-            <div className="text-xs text-secondary-600 dark:text-secondary-400 font-mono">LATENCY</div>
+            <div className="text-xs text-secondary-600 dark:text-secondary-400 font-mono">RESPONSE</div>
           </div>
           <div className="text-center p-4 bg-white/10 dark:bg-secondary-800/20 backdrop-blur-sm rounded-xl border border-white/20 dark:border-secondary-700/30">
             <div className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
               24/7
             </div>
-            <div className="text-xs text-secondary-600 dark:text-secondary-400 font-mono">SUPPORT</div>
+            <div className="text-xs text-secondary-600 dark:text-secondary-400 font-mono">AVAILABLE</div>
           </div>
         </div>
       </div>

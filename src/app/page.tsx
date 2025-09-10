@@ -4,7 +4,6 @@ import { Navigation } from '@/components/ui/Navigation'
 import { Button } from '@/components/ui/Button'
 import { Card, CardContent } from '@/components/ui/Card'
 import { InteractiveChat } from '@/components/ui/InteractiveChat'
-import { CompactAnalytics } from '@/components/ui/CompactAnalytics'
 import { DynamicPlatforms } from '@/components/ui/DynamicPlatforms'
 import { AnimatedStatsSimple } from '@/components/ui/AnimatedStatsSimple'
 import Link from 'next/link'
@@ -128,7 +127,7 @@ export default function HomePage() {
       />
 
       {/* Hero Section */}
-      <section className="section-padding pt-24 lg:pt-32 pb-20 lg:pb-28 relative overflow-hidden">
+      <section className="section-padding pt-32 sm:pt-28 lg:pt-32 pb-20 lg:pb-28 relative overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950"></div>
         <div className="absolute inset-0 opacity-10">
@@ -212,9 +211,16 @@ export default function HomePage() {
                 {/* AI Chat Interface */}
                 <InteractiveChat />
                 
-                {/* Real-time Analytics Dashboard */}
+                {/* Demo Notice */}
                 <div className="transform -rotate-1 hover:rotate-0 transition-transform duration-500">
-                  <CompactAnalytics />
+                  <Card className="p-4 bg-gradient-to-r from-white/95 to-primary-50/80 dark:from-secondary-900/95 dark:to-secondary-800/80 backdrop-blur-lg border border-white/20 dark:border-secondary-700/20 shadow-lg">
+                    <div className="flex items-center justify-center space-x-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <span className="text-sm font-semibold text-secondary-800 dark:text-secondary-200">
+                        Try our AI assistant above! Response time shown in the chat header.
+                      </span>
+                    </div>
+                  </Card>
                 </div>
               </div>
             </div>
@@ -227,29 +233,29 @@ export default function HomePage() {
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-semibold font-mono text-secondary-900 dark:text-white mb-4">
-              Why Businesses Choose Us
+              What We're Building
             </h2>
             <p className="text-lg text-secondary-600 dark:text-secondary-300 max-w-2xl mx-auto">
-              Simple numbers that show the impact of our AI assistants on real businesses.
+              We're a new company focused on creating the best AI assistant experience for small businesses.
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             {[
               { 
-                value: '500+', 
-                label: 'Happy Businesses',
-                icon: '🏢'
+                value: '2025', 
+                label: 'Founded This Year',
+                icon: '🚀'
               },
               { 
                 value: '24/7', 
-                label: 'Always Working',
+                label: 'AI Never Sleeps',
                 icon: '⏰'
               },
               { 
-                value: '98%', 
-                label: 'Customer Satisfaction',
-                icon: '😊'
+                value: '100%', 
+                label: 'Focused on You',
+                icon: '🎯'
               }
             ].map((stat, index) => (
               <div key={index} className="text-center p-8 bg-gradient-to-br from-primary-50 to-accent-50/50 dark:from-secondary-800 dark:to-primary-900/20 rounded-xl border border-primary-200/30 dark:border-primary-800/30 hover:scale-105 transition-all duration-300">
@@ -692,169 +698,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials Section */}
-      <section className="py-20 lg:py-28 bg-gradient-to-br from-secondary-50 via-primary-50/30 to-accent-50/40 dark:from-secondary-900 dark:via-secondary-800 dark:to-secondary-900">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-semibold font-mono text-secondary-900 dark:text-white mb-4">
-              Stories from Business Owners
-            </h2>
-            <p className="text-lg text-secondary-600 dark:text-secondary-300 max-w-2xl mx-auto">
-              Real businesses, real results. See how our AI assistants are transforming customer relationships and growing revenue.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {/* Testimonial 1 */}
-            <div className="group relative">
-              <div className="bg-white/90 dark:bg-secondary-800/90 backdrop-blur-sm p-8 rounded-2xl border border-primary-200/30 dark:border-primary-800/30 shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:scale-[1.02] h-full">
-                {/* Quote Icon */}
-                <div className="mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179z"/>
-                    </svg>
-                  </div>
-                </div>
-
-                {/* Testimonial Content */}
-                <blockquote className="text-secondary-700 dark:text-secondary-200 mb-6 text-base leading-relaxed">
-                  "Our AI assistant handles 80% of customer questions automatically. I get to sleep through the night knowing customers are being helped 24/7. Revenue is up 40% this quarter!"
-                </blockquote>
-
-                {/* Author */}
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-accent-100 dark:from-primary-900 dark:to-accent-900 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-semibold font-mono text-primary-600 dark:text-primary-400">SM</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold font-mono text-secondary-900 dark:text-white">Sarah Mitchell</div>
-                    <div className="text-sm text-secondary-600 dark:text-secondary-400">Owner, Boutique Fashion Store</div>
-                  </div>
-                </div>
-
-                {/* Rating Stars */}
-                <div className="flex items-center mt-4 space-x-1">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                  ))}
-                </div>
-              </div>
-              
-              {/* Floating decoration */}
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-accent-500 to-primary-500 rounded-lg rotate-12 opacity-60 group-hover:rotate-45 transition-transform duration-300"></div>
-            </div>
-
-            {/* Testimonial 2 */}
-            <div className="group relative">
-              <div className="bg-white/90 dark:bg-secondary-800/90 backdrop-blur-sm p-8 rounded-2xl border border-primary-200/30 dark:border-primary-800/30 shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:scale-[1.02] h-full">
-                <div className="mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-accent-500 to-primary-500 rounded-xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179z"/>
-                    </svg>
-                  </div>
-                </div>
-
-                <blockquote className="text-secondary-700 dark:text-secondary-200 mb-6 text-base leading-relaxed">
-                  "I was skeptical about AI, but this changed everything. My assistant knows our menu better than some of my staff! Orders are more accurate and customers love the instant responses."
-                </blockquote>
-
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-accent-100 dark:from-primary-900 dark:to-accent-900 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-semibold font-mono text-primary-600 dark:text-primary-400">MC</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold font-mono text-secondary-900 dark:text-white">Marco Chen</div>
-                    <div className="text-sm text-secondary-600 dark:text-secondary-400">Restaurant Owner</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center mt-4 space-x-1">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-primary-500 to-accent-500 rounded-lg rotate-12 opacity-60 group-hover:rotate-45 transition-transform duration-300"></div>
-            </div>
-
-            {/* Testimonial 3 */}
-            <div className="group relative">
-              <div className="bg-white/90 dark:bg-secondary-800/90 backdrop-blur-sm p-8 rounded-2xl border border-primary-200/30 dark:border-primary-800/30 shadow-xl hover:shadow-2xl transition-all duration-300 group-hover:scale-[1.02] h-full">
-                <div className="mb-6">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary-600 to-accent-400 rounded-xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M4.583 17.321C3.553 16.227 3 15 3 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179zm10 0C13.553 16.227 13 15 13 13.011c0-3.5 2.457-6.637 6.03-8.188l.893 1.378c-3.335 1.804-3.987 4.145-4.247 5.621.537-.278 1.24-.375 1.929-.311 1.804.167 3.226 1.648 3.226 3.489a3.5 3.5 0 01-3.5 3.5c-1.073 0-2.099-.49-2.748-1.179z"/>
-                    </svg>
-                  </div>
-                </div>
-
-                <blockquote className="text-secondary-700 dark:text-secondary-200 mb-6 text-base leading-relaxed">
-                  "Best investment I've made! The AI handles appointment bookings, answers questions about our services, and even upsells treatments. My team can focus on what they do best - making people feel beautiful."
-                </blockquote>
-
-                <div className="flex items-center space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-accent-100 dark:from-primary-900 dark:to-accent-900 rounded-full flex items-center justify-center">
-                    <span className="text-lg font-semibold font-mono text-primary-600 dark:text-primary-400">LP</span>
-                  </div>
-                  <div>
-                    <div className="font-semibold font-mono text-secondary-900 dark:text-white">Lisa Rodriguez</div>
-                    <div className="text-sm text-secondary-600 dark:text-secondary-400">Salon & Spa Owner</div>
-                  </div>
-                </div>
-
-                <div className="flex items-center mt-4 space-x-1">
-                  {[...Array(5)].map((_, i) => (
-                    <svg key={i} className="w-4 h-4 text-yellow-400 fill-current" viewBox="0 0 24 24">
-                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                    </svg>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="absolute -top-2 -right-2 w-6 h-6 bg-gradient-to-br from-accent-400 to-primary-600 rounded-lg rotate-12 opacity-60 group-hover:rotate-45 transition-transform duration-300"></div>
-            </div>
-          </div>
-
-          {/* Trust indicators */}
-          <div className="mt-16 text-center">
-            <div className="flex flex-wrap justify-center items-center gap-8 text-secondary-600 dark:text-secondary-400">
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-500 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                  </svg>
-                </div>
-                <span className="font-mono text-sm">99.9% Uptime</span>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C13.1 2 14 2.9 14 4C14 5.1 13.1 6 12 6C10.9 6 10 5.1 10 4C10 2.9 10.9 2 12 2ZM21 9V7L15 1L9 7V9C9 10.1 9.9 11 11 11V19H13V11C14.1 11 15 10.1 15 9V7.5L13.5 6C13.7 6 14 6 14 6L21 9Z"/>
-                  </svg>
-                </div>
-                <span className="font-mono text-sm">24/7 Support</span>
-              </div>
-              
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12,17A2,2 0 0,0 14,15C14,13.89 13.1,13 12,13A2,2 0 0,0 10,15A2,2 0 0,0 12,17M18,8A2,2 0 0,1 20,10V20A2,2 0 0,1 18,22H6A2,2 0 0,1 4,20V10C4,8.89 4.9,8 6,8H7V6A5,5 0 0,1 12,1A5,5 0 0,1 17,6V8H18M12,3A3,3 0 0,0 9,6V8H15V6A3,3 0 0,0 12,3Z"/>
-                  </svg>
-                </div>
-                <span className="font-mono text-sm">Bank-Level Security</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* TESTIMONIALS SECTION - COMMENTED OUT FOR FUTURE USE
+         Will be added when we have real customer reviews
+      */}
 
       {/* Get Started for Free Section */}
       <section className="py-24 lg:py-32 bg-gradient-to-r from-primary-600 to-accent-600 relative overflow-hidden">
