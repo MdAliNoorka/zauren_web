@@ -169,42 +169,42 @@ export function DynamicPlatforms() {
         </p>
       </div>
 
-      {/* Tech-style carousel container */}
-      <div className="relative max-w-6xl mx-auto">
-        {/* Background grid effect */}
-        <div className="absolute inset-0 opacity-10 dark:opacity-20 pointer-events-none">
-          <div className="grid grid-cols-12 grid-rows-8 h-full w-full">
-            {Array.from({ length: 96 }).map((_, i) => (
+      {/* Tech-style carousel container - Compact version */}
+      <div className="relative max-w-4xl mx-auto">
+        {/* Background grid effect - More subtle */}
+        <div className="absolute inset-0 opacity-5 dark:opacity-10 pointer-events-none">
+          <div className="grid grid-cols-8 grid-rows-6 h-full w-full">
+            {Array.from({ length: 48 }).map((_, i) => (
               <div key={i} className="border border-primary-400/20"></div>
             ))}
           </div>
         </div>
 
-        {/* Main carousel container */}
-        <div className="relative bg-white/5 dark:bg-secondary-900/20 backdrop-blur-xl rounded-3xl border border-white/20 dark:border-secondary-700/30 p-8 shadow-2xl">
-          {/* Navigation arrows */}
+        {/* Main carousel container - Smaller background */}
+        <div className="relative bg-white/30 dark:bg-secondary-900/30 backdrop-blur-sm rounded-2xl border border-white/20 dark:border-secondary-700/20 p-6 shadow-lg">
+          {/* Navigation arrows - More compact */}
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full flex items-center justify-center text-white hover:scale-110 transition-all duration-300 shadow-lg group"
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full flex items-center justify-center text-white hover:scale-105 transition-all duration-300 shadow-md group"
             disabled={totalSlides <= 1}
           >
-            <svg className="w-6 h-6 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
 
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-12 h-12 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full flex items-center justify-center text-white hover:scale-110 transition-all duration-300 shadow-lg group"
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 w-10 h-10 bg-gradient-to-r from-primary-500 to-accent-500 rounded-full flex items-center justify-center text-white hover:scale-105 transition-all duration-300 shadow-md group"
             disabled={totalSlides <= 1}
           >
-            <svg className="w-6 h-6 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-5 h-5 group-hover:translate-x-0.5 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
 
-          {/* Platforms display */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 min-h-[200px]">
+          {/* Platforms display - More compact */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 min-h-[180px]">
             {getCurrentPlatforms().map((platform, index) => {
               const IconComponent = platform.icon
               const globalIndex = currentIndex * platformsPerView + index
@@ -219,9 +219,9 @@ export function DynamicPlatforms() {
                     animationDelay: `${index * 100}ms`
                   }}
                 >
-                  {/* Platform icon container */}
+                  {/* Platform icon container - More compact */}
                   <div className="relative">
-                    <div className={`w-20 h-20 ${platform.color} rounded-2xl flex items-center justify-center text-white shadow-xl group-hover:scale-110 transition-all duration-300 relative overflow-hidden`}>
+                    <div className={`w-16 h-16 ${platform.color} rounded-xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-all duration-300 relative overflow-hidden`}>
                       {/* Tech grid overlay */}
                       <div className="absolute inset-0 opacity-20">
                         <div className="grid grid-cols-4 grid-rows-4 h-full w-full">
@@ -231,15 +231,15 @@ export function DynamicPlatforms() {
                         </div>
                       </div>
                       
-                      <IconComponent className="w-10 h-10 relative z-10" />
+                      <IconComponent className="w-8 h-8 relative z-10" />
                       
                       {/* Glow effect */}
                       <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                     </div>
 
-                    {/* Connection indicator */}
-                    <div className="absolute -top-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white dark:border-secondary-900 flex items-center justify-center">
-                      <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                    {/* Connection indicator - Smaller */}
+                    <div className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white dark:border-secondary-900 flex items-center justify-center">
+                      <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
                     </div>
                   </div>
                   

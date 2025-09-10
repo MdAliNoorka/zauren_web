@@ -30,44 +30,19 @@
   }
 
   .btn-primary {
-    @apply btn bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-500 shadow-lg hover:shadow-xl;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-
-  .btn-primary:hover {
-    transform: translateY(-3px) scale(1.05);
+    @apply btn bg-primary-600 hover:bg-primary-700 text-white focus:ring-primary-500 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5;
   }
 
   .btn-secondary {
     @apply btn bg-secondary-100 hover:bg-secondary-200 dark:bg-secondary-800 dark:hover:bg-secondary-700 text-secondary-900 dark:text-secondary-100 focus:ring-secondary-500;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-
-  .btn-secondary:hover {
-    transform: translateY(-2px) scale(1.03);
   }
 
   .btn-outline {
     @apply btn border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white focus:ring-primary-500;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-
-  .btn-outline:hover {
-    transform: translateY(-2px) scale(1.03);
   }
 
   .btn-ghost {
     @apply btn text-secondary-600 hover:text-secondary-900 dark:text-secondary-400 dark:hover:text-secondary-100 hover:bg-secondary-100 dark:hover:bg-secondary-800 focus:ring-secondary-500;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-
-  .btn-ghost:hover {
-    transform: translateY(-1px) scale(1.02);
-  }
-
-  .btn:active {
-    transform: translateY(0) scale(0.98) !important;
-    transition: all 0.1s ease-out;
   }
 
   .card {
@@ -103,7 +78,7 @@
   }
 
   .section-padding {
-    @apply px-4 sm:px-6 lg:px-8 py-8 sm:py-12 lg:py-16;
+    @apply px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-12;
   }
 
   .container-width {
