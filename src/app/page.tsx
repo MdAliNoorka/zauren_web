@@ -128,7 +128,7 @@ export default function HomePage() {
       />
 
       {/* Hero Section */}
-      <section className="section-padding pt-24 lg:pt-32 relative overflow-hidden">
+      <section className="section-padding pt-24 lg:pt-32 pb-20 lg:pb-28 relative overflow-hidden">
         {/* Animated Background */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-accent-50 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950"></div>
         <div className="absolute inset-0 opacity-10">
@@ -223,7 +223,7 @@ export default function HomePage() {
       </section>
 
       {/* Simple Stats Section */}
-      <section className="py-16 bg-white dark:bg-secondary-900">
+      <section className="py-20 lg:py-24 bg-white dark:bg-secondary-900">
         <div className="container mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-semibold font-mono text-secondary-900 dark:text-white mb-4">
@@ -267,7 +267,7 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="section-padding bg-secondary-50 dark:bg-secondary-950 relative">
+      <section id="features" className="section-padding py-20 lg:py-28 bg-secondary-50 dark:bg-secondary-950 relative">
         <div className="container-width">
           <div className="text-center mb-12 animate-slide-up">
             <h2 className="text-lg lg:text-2xl font-semibold font-mono mb-6">
@@ -278,14 +278,14 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Horizontal Carousel */}
+          {/* Horizontal Carousel - Responsive */}
           <div className="relative">
             <div id="carousel-container" className="overflow-hidden">
               <div id="carousel-track" className="flex transition-transform duration-500 ease-in-out" style={{transform: 'translateX(0%)'}}>
                 {features.map((feature, index) => (
                   <div
                     key={feature.title}
-                    className="w-full md:w-1/2 lg:w-1/3 flex-shrink-0 px-3"
+                    className="w-full sm:w-1/2 lg:w-1/3 flex-shrink-0 px-3"
                   >
                     <Card hover className="h-[420px] flex flex-col p-0 relative overflow-hidden bg-white dark:bg-secondary-900 border-primary-200/30 dark:border-primary-800/30">
                       {/* Tech Grid Background */}
@@ -340,22 +340,35 @@ export default function HomePage() {
               </div>
             </div>
             
-            {/* Carousel Controls */}
+            {/* Carousel Controls - Responsive */}
             <div className="flex justify-center items-center mt-6 space-x-4">
               <button 
                 id="prev-btn"
                 className="w-12 h-12 bg-white dark:bg-secondary-800 border-2 border-primary-200 dark:border-primary-800 rounded-full flex items-center justify-center hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={() => {
-                  const track = document.getElementById('carousel-track');
-                  const container = document.getElementById('carousel-container');
-                  const cardWidth = container.offsetWidth / 3; // Show 3 cards
+                  const track = document.getElementById('carousel-track') as HTMLElement;
+                  const container = document.getElementById('carousel-container') as HTMLElement;
+                  
+                  if (!track || !container) return;
+                  
+                  // Determine cards per view based on screen size
+                  const screenWidth = window.innerWidth;
+                  let cardsPerView;
+                  if (screenWidth < 640) cardsPerView = 1; // sm breakpoint
+                  else if (screenWidth < 1024) cardsPerView = 2; // lg breakpoint  
+                  else cardsPerView = 3;
+                  
+                  const movePercent = 100 / cardsPerView;
                   let currentTranslate = parseInt(track.style.transform.replace('translateX(', '').replace('%)', '')) || 0;
-                  const newTranslate = Math.min(currentTranslate + (100/3), 0);
+                  const newTranslate = Math.min(currentTranslate + movePercent, 0);
                   track.style.transform = `translateX(${newTranslate}%)`;
                   
                   // Update button states
-                  document.getElementById('prev-btn').disabled = newTranslate >= 0;
-                  document.getElementById('next-btn').disabled = newTranslate <= -((features.length - 3) * (100/3));
+                  const maxSlides = Math.max(0, features.length - cardsPerView);
+                  const prevBtn = document.getElementById('prev-btn') as HTMLButtonElement;
+                  const nextBtn = document.getElementById('next-btn') as HTMLButtonElement;
+                  if (prevBtn) prevBtn.disabled = newTranslate >= 0;
+                  if (nextBtn) nextBtn.disabled = newTranslate <= -(maxSlides * movePercent);
                 }}
               >
                 <svg className="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -363,32 +376,70 @@ export default function HomePage() {
                 </svg>
               </button>
               
-              {/* Dots Indicator */}
+              {/* Dots Indicator - Responsive */}
               <div className="flex space-x-2">
-                {Array.from({ length: Math.max(1, features.length - 2) }).map((_, index) => (
-                  <div 
-                    key={index}
-                    className={`w-2 h-2 rounded-full transition-colors duration-200 ${
-                      index === 0 ? 'bg-primary-500' : 'bg-primary-200 dark:bg-primary-800'
-                    }`}
-                  />
-                ))}
+                <script 
+                  dangerouslySetInnerHTML={{
+                    __html: `
+                      window.addEventListener('DOMContentLoaded', function() {
+                        function updateDots() {
+                          const screenWidth = window.innerWidth;
+                          let cardsPerView;
+                          if (screenWidth < 640) cardsPerView = 1;
+                          else if (screenWidth < 1024) cardsPerView = 2;
+                          else cardsPerView = 3;
+                          
+                          const maxSlides = Math.max(1, ${features.length} - cardsPerView + 1);
+                          const dotsContainer = document.querySelector('.dots-container');
+                          if (dotsContainer) {
+                            dotsContainer.innerHTML = '';
+                            for (let i = 0; i < maxSlides; i++) {
+                              const dot = document.createElement('div');
+                              dot.className = 'w-2 h-2 rounded-full transition-colors duration-200 ' + (i === 0 ? 'bg-primary-500' : 'bg-primary-200 dark:bg-primary-800');
+                              dotsContainer.appendChild(dot);
+                            }
+                          }
+                        }
+                        
+                        updateDots();
+                        window.addEventListener('resize', updateDots);
+                      });
+                    `
+                  }}
+                />
+                <div className="dots-container flex space-x-2">
+                  {/* Dots will be dynamically generated */}
+                </div>
               </div>
               
               <button 
                 id="next-btn"
                 className="w-12 h-12 bg-white dark:bg-secondary-800 border-2 border-primary-200 dark:border-primary-800 rounded-full flex items-center justify-center hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                 onClick={() => {
-                  const track = document.getElementById('carousel-track');
-                  const container = document.getElementById('carousel-container');
-                  const maxTranslate = -((features.length - 3) * (100/3));
+                  const track = document.getElementById('carousel-track') as HTMLElement;
+                  const container = document.getElementById('carousel-container') as HTMLElement;
+                  
+                  if (!track || !container) return;
+                  
+                  // Determine cards per view based on screen size
+                  const screenWidth = window.innerWidth;
+                  let cardsPerView;
+                  if (screenWidth < 640) cardsPerView = 1; // sm breakpoint
+                  else if (screenWidth < 1024) cardsPerView = 2; // lg breakpoint
+                  else cardsPerView = 3;
+                  
+                  const movePercent = 100 / cardsPerView;
+                  const maxSlides = Math.max(0, features.length - cardsPerView);
+                  const maxTranslate = -(maxSlides * movePercent);
                   let currentTranslate = parseInt(track.style.transform.replace('translateX(', '').replace('%)', '')) || 0;
-                  const newTranslate = Math.max(currentTranslate - (100/3), maxTranslate);
+                  const newTranslate = Math.max(currentTranslate - movePercent, maxTranslate);
                   track.style.transform = `translateX(${newTranslate}%)`;
                   
                   // Update button states
-                  document.getElementById('prev-btn').disabled = newTranslate >= 0;
-                  document.getElementById('next-btn').disabled = newTranslate <= maxTranslate;
+                  const prevBtn = document.getElementById('prev-btn') as HTMLButtonElement;
+                  const nextBtn = document.getElementById('next-btn') as HTMLButtonElement;
+                  if (prevBtn) prevBtn.disabled = newTranslate >= 0;
+                  if (nextBtn) nextBtn.disabled = newTranslate <= maxTranslate;
                 }}
               >
                 <svg className="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -401,7 +452,7 @@ export default function HomePage() {
       </section>
 
       {/* How It Works Section */}
-      <section className="section-padding bg-gradient-to-br from-secondary-50 via-primary-50/30 to-accent-50/30 dark:from-secondary-900 dark:via-secondary-800 dark:to-secondary-900 relative overflow-hidden">
+      <section className="section-padding py-20 lg:py-28 bg-gradient-to-br from-secondary-50 via-primary-50/30 to-accent-50/30 dark:from-secondary-900 dark:via-secondary-800 dark:to-secondary-900 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="grid grid-cols-10 grid-rows-10 h-full w-full">
             {Array.from({ length: 100 }).map((_, i) => (
@@ -642,7 +693,7 @@ export default function HomePage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="py-16 bg-gradient-to-br from-secondary-50 via-primary-50/30 to-accent-50/40 dark:from-secondary-900 dark:via-secondary-800 dark:to-secondary-900">
+      <section className="py-20 lg:py-28 bg-gradient-to-br from-secondary-50 via-primary-50/30 to-accent-50/40 dark:from-secondary-900 dark:via-secondary-800 dark:to-secondary-900">
         <div className="container mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl lg:text-4xl font-semibold font-mono text-secondary-900 dark:text-white mb-4">
@@ -806,7 +857,7 @@ export default function HomePage() {
       </section>
 
       {/* Get Started for Free Section */}
-      <section className="py-20 bg-gradient-to-r from-primary-600 to-accent-600 relative overflow-hidden">
+      <section className="py-24 lg:py-32 bg-gradient-to-r from-primary-600 to-accent-600 relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
         <div className="container mx-auto px-6 relative z-10">
           <div className="text-center max-w-4xl mx-auto">
@@ -861,7 +912,7 @@ export default function HomePage() {
       </section>
 
       {/* Footer */}
-      <footer className="section-padding bg-secondary-900 dark:bg-secondary-950 text-white">
+      <footer className="section-padding py-16 lg:py-20 bg-secondary-900 dark:bg-secondary-950 text-white">
         <div className="container-width">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="space-y-4">
