@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { User, Session } from '@supabase/supabase-js'
 import { createClientComponent } from '@/lib/supabase'
 
@@ -89,7 +89,7 @@ export function useAuth() {
   }
 
   // Refresh session data
-  const refreshSession = async () => {
+  const refreshSession = useCallback(async () => {
     setLoading(true)
     
     try {
@@ -126,7 +126,7 @@ export function useAuth() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [supabase])
 
   // Sign out using Edge Function
   const signOut = async () => {
@@ -193,7 +193,7 @@ export function useAuth() {
     )
 
     return () => subscription.unsubscribe()
-  }, [supabase.auth])
+  }, [supabase.auth, refreshSession])
 
   // Periodic session validation (every 5 minutes) when authenticated
   useEffect(() => {
@@ -204,7 +204,7 @@ export function useAuth() {
 
       return () => clearInterval(interval)
     }
-  }, [isAuthenticated, loading])
+  }, [isAuthenticated, loading, refreshSession])
 
   return {
     user,
