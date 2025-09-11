@@ -83,15 +83,26 @@ export interface Database {
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || 'placeholder-key'
 
-// Client-side Supabase client
-export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey)
+// Singleton client instance to prevent multiple GoTrueClient instances
+let clientInstance: any = null
 
 // Client component Supabase client (for use in client components)
 export const createClientComponent = () => {
+  // Return existing instance if already created
+  if (clientInstance) {
+    return clientInstance
+  }
+
   // Only create client if environment variables are properly set
   if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    return createClientComponentClient<Database>()
+    clientInstance = createClientComponentClient<Database>()
+    return clientInstance
   }
+  
   // Return a mock client for build time
-  return createClient<Database>(supabaseUrl, supabaseAnonKey)
+  clientInstance = createClient<Database>(supabaseUrl, supabaseAnonKey)
+  return clientInstance
 }
+
+// Legacy export for backward compatibility
+export const supabase = createClientComponent()
