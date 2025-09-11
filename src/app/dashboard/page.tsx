@@ -1,5 +1,8 @@
 'use client'
 
+// Force dynamic rendering to avoid static generation errors
+export const dynamic = 'force-dynamic'
+
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/ui/Navigation'
@@ -64,7 +67,7 @@ const quickActions = [
   },
 ]
 
-export default function DashboardPage() {
+function DashboardContent() {
   const { user, loading } = useAuthContext()
   const router = useRouter()
   const [mounted, setMounted] = useState(false)
@@ -253,4 +256,22 @@ export default function DashboardPage() {
       </main>
     </div>
   )
+}
+
+export default function DashboardPage() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-primary-50/30 to-accent-50/30 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 flex items-center justify-center">
+        <div className="w-8 h-8 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin"></div>
+      </div>
+    )
+  }
+
+  return <DashboardContent />
 }
