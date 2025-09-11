@@ -43,6 +43,7 @@ export function useAuth() {
   const [profile, setProfile] = useState<UserProfile | null>(null)
   const [loading, setLoading] = useState(true)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [initialized, setInitialized] = useState(false)
   
   const supabase = createClientComponent()
 
@@ -89,8 +90,10 @@ export function useAuth() {
   }
 
   // Refresh session data
-  const refreshSession = useCallback(async () => {
-    setLoading(true)
+  const refreshSession = useCallback(async (skipLoading = false) => {
+    if (!skipLoading && !initialized) {
+      setLoading(true)
+    }
     
     try {
       const { data: { session: supabaseSession }, error } = await supabase.auth.getSession()
@@ -101,21 +104,27 @@ export function useAuth() {
         setProfile(null)
         setSession(null)
         setIsAuthenticated(false)
+        setInitialized(true)
         return
       }
       
       if (supabaseSession?.user) {
-        setSession(supabaseSession)
-        setUser(supabaseSession.user)
-        setProfile(null) // Simplified - no profile for now
-        setIsAuthenticated(true)
-        console.log('✅ Session refreshed successfully:', supabaseSession.user.email)
+        // Only update if session actually changed
+        if (!session || session.access_token !== supabaseSession.access_token) {
+          setSession(supabaseSession)
+          setUser(supabaseSession.user)
+          setProfile(null) // Simplified - no profile for now
+          setIsAuthenticated(true)
+          console.log('✅ Session updated:', supabaseSession.user.email)
+        }
       } else {
-        setUser(null)
-        setProfile(null)
-        setSession(null)
-        setIsAuthenticated(false)
-        console.log('❌ No active session found')
+        if (isAuthenticated) {
+          setUser(null)
+          setProfile(null)
+          setSession(null)
+          setIsAuthenticated(false)
+          console.log('❌ Session expired')
+        }
       }
     } catch (error) {
       console.error('Session refresh error:', error)
@@ -124,9 +133,12 @@ export function useAuth() {
       setSession(null)
       setIsAuthenticated(false)
     } finally {
-      setLoading(false)
+      if (!skipLoading && !initialized) {
+        setLoading(false)
+        setInitialized(true)
+      }
     }
-  }, [supabase])
+  }, [supabase, session, isAuthenticated, initialized])
 
   // Sign out using Edge Function
   const signOut = async () => {
@@ -167,9 +179,13 @@ export function useAuth() {
   }
 
   useEffect(() => {
+    let mounted = true
+
     // Get initial session
     const getInitialSession = async () => {
-      await refreshSession()
+      if (mounted) {
+        await refreshSession()
+      }
     }
 
     getInitialSession()
@@ -177,6 +193,8 @@ export function useAuth() {
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: any, supabaseSession: any) => {
+        if (!mounted) return
+        
         console.log('Auth state change:', event)
         
         if (event === 'SIGNED_OUT' || !supabaseSession) {
@@ -185,31 +203,39 @@ export function useAuth() {
           setSession(null)
           setIsAuthenticated(false)
           setLoading(false)
+          setInitialized(true)
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          // Only refresh if we don't already have this session
-          if (!session || session.access_token !== supabaseSession.access_token) {
-            await refreshSession()
-          }
+          // Update session data directly without refresh to prevent loops
+          setSession(supabaseSession)
+          setUser(supabaseSession.user)
+          setProfile(null)
+          setIsAuthenticated(true)
+          setLoading(false)
+          setInitialized(true)
+          console.log('✅ Auth state updated:', supabaseSession.user.email)
         }
       }
     )
 
-    return () => subscription.unsubscribe()
-  }, [supabase.auth, refreshSession, session])
+    return () => {
+      mounted = false
+      subscription.unsubscribe()
+    }
+  }, [supabase.auth]) // Remove refreshSession and session from dependencies
 
-  // Periodic session validation (every 10 minutes instead of 5) when authenticated
+  // Periodic session validation (only when needed)
   useEffect(() => {
-    if (isAuthenticated && !loading && user) {
+    if (initialized && isAuthenticated && user && session) {
       const interval = setInterval(() => {
         // Only refresh if user is still on the page and session exists
-        if (document.visibilityState === 'visible' && session) {
-          refreshSession()
+        if (document.visibilityState === 'visible') {
+          refreshSession(true) // Skip loading state for background refreshes
         }
-      }, 10 * 60 * 1000) // 10 minutes
+      }, 15 * 60 * 1000) // 15 minutes - longer interval
 
       return () => clearInterval(interval)
     }
-  }, [isAuthenticated, loading, refreshSession, user, session])
+  }, [initialized, isAuthenticated, user, session, refreshSession])
 
   return {
     user,
@@ -217,6 +243,7 @@ export function useAuth() {
     profile,
     loading,
     isAuthenticated,
+    initialized,
     signOut,
     refreshSession,
     updateProfile,

@@ -7,7 +7,11 @@ interface AuthContextType {
   user: any
   session: any
   loading: boolean
+  isAuthenticated: boolean
+  initialized: boolean
   signOut: () => Promise<void>
+  refreshSession: (skipLoading?: boolean) => Promise<void>
+  updateProfile: (profileData: any) => Promise<boolean>
   supabase: any
 }
 

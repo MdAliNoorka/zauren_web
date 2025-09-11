@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Navigation } from '@/components/ui/Navigation'
 import { useAuthContext } from '@/contexts/AuthContext'
+import { AuthGuard } from '@/components/auth/AuthGuard'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { 
@@ -68,43 +69,7 @@ const quickActions = [
 ]
 
 function DashboardContent() {
-  const { user, loading } = useAuthContext()
-  const router = useRouter()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  useEffect(() => {
-    if (mounted && !loading && !user) {
-      console.log('No user found, redirecting to signin...')
-      router.push('/auth/signin')
-    }
-  }, [user, loading, router, mounted])
-
-  // Show loading state
-  if (!mounted || loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-primary-50/30 to-accent-50/30 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-8 h-8 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin mx-auto"></div>
-          <p className="text-sm text-secondary-600 dark:text-secondary-400 font-mono">Loading your dashboard...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Show redirect message if no user (during redirect)
-  if (!user) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-primary-50/30 to-accent-50/30 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <p className="text-lg font-mono text-secondary-600 dark:text-secondary-400">Redirecting to sign in...</p>
-        </div>
-      </div>
-    )
-  }
+  const { user } = useAuthContext()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-primary-50/30 to-accent-50/30 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 relative overflow-hidden">
@@ -271,19 +236,9 @@ function DashboardContent() {
 }
 
 export default function DashboardPage() {
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-primary-50/30 to-accent-50/30 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin"></div>
-      </div>
-    )
-  }
-
-  return <DashboardContent />
+  return (
+    <AuthGuard>
+      <DashboardContent />
+    </AuthGuard>
+  )
 }
