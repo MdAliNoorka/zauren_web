@@ -78,20 +78,32 @@ function DashboardContent() {
 
   useEffect(() => {
     if (mounted && !loading && !user) {
+      console.log('No user found, redirecting to signin...')
       router.push('/auth/signin')
     }
   }, [user, loading, router, mounted])
 
+  // Show loading state
   if (!mounted || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-primary-50/30 to-accent-50/30 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin"></div>
+        <div className="text-center space-y-4">
+          <div className="w-8 h-8 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin mx-auto"></div>
+          <p className="text-sm text-secondary-600 dark:text-secondary-400 font-mono">Loading your dashboard...</p>
+        </div>
       </div>
     )
   }
 
+  // Show redirect message if no user (during redirect)
   if (!user) {
-    return null
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-secondary-50 via-primary-50/30 to-accent-50/30 dark:from-secondary-950 dark:via-secondary-900 dark:to-secondary-950 flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-lg font-mono text-secondary-600 dark:text-secondary-400">Redirecting to sign in...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -111,13 +123,13 @@ function DashboardContent() {
           {/* Header */}
           <div className="mb-12">
             <div className="text-center space-y-4">
-              <h1 className="text-4xl lg:text-5xl font-bold text-secondary-900 dark:text-white">
+              <h1 className="text-4xl lg:text-5xl font-bold font-mono text-secondary-900 dark:text-white">
                 Welcome back,{' '}
                 <span className="bg-gradient-to-r from-primary-600 via-accent-500 to-primary-700 bg-clip-text text-transparent">
                   {user.user_metadata?.full_name || user.email?.split('@')[0] || 'User'}
                 </span>
               </h1>
-              <p className="text-lg text-secondary-600 dark:text-secondary-300 max-w-2xl mx-auto">
+              <p className="text-lg font-sans text-secondary-600 dark:text-secondary-300 max-w-2xl mx-auto">
                 Your AI-powered customer service dashboard. Monitor performance, manage agents, and grow your business.
               </p>
             </div>
@@ -138,10 +150,10 @@ function DashboardContent() {
                     </span>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-2xl font-bold text-secondary-900 dark:text-white">
+                    <p className="text-2xl font-bold font-mono text-secondary-900 dark:text-white">
                       {stat.value}
                     </p>
-                    <p className="text-sm text-secondary-600 dark:text-secondary-400 font-mono">
+                    <p className="text-sm text-secondary-600 dark:text-secondary-400 font-sans">
                       {stat.label}
                     </p>
                   </div>
@@ -152,7 +164,7 @@ function DashboardContent() {
 
           {/* Quick Actions */}
           <div className="mb-12">
-            <h2 className="text-2xl font-bold text-secondary-900 dark:text-white mb-6 text-center">
+            <h2 className="text-2xl font-bold font-mono text-secondary-900 dark:text-white mb-6 text-center">
               Quick Actions
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -165,10 +177,10 @@ function DashboardContent() {
                         <Icon className="w-7 h-7 text-white" />
                       </div>
                       <div className="text-center space-y-2">
-                        <h3 className="font-semibold text-secondary-900 dark:text-white">
+                        <h3 className="font-semibold font-mono text-secondary-900 dark:text-white">
                           {action.title}
                         </h3>
-                        <p className="text-sm text-secondary-600 dark:text-secondary-400">
+                        <p className="text-sm font-sans text-secondary-600 dark:text-secondary-400">
                           {action.description}
                         </p>
                       </div>
@@ -189,7 +201,7 @@ function DashboardContent() {
             <Card className="p-6 bg-gradient-to-br from-white/95 to-primary-50/80 dark:from-secondary-900/95 dark:to-secondary-800/80 backdrop-blur-lg border border-white/20 dark:border-secondary-700/20 shadow-lg">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">
+                  <h3 className="text-lg font-semibold font-mono text-secondary-900 dark:text-white">
                     Recent Activity
                   </h3>
                   <TrendingUp className="w-5 h-5 text-primary-500" />
@@ -203,7 +215,7 @@ function DashboardContent() {
                   ].map((activity, index) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r from-primary-50/50 to-accent-50/50 dark:from-primary-950/30 dark:to-accent-950/30 rounded-lg border border-primary-200/30 dark:border-primary-800/30">
                       <div className="space-y-1">
-                        <p className="text-sm font-medium text-secondary-900 dark:text-white">
+                        <p className="text-sm font-medium font-sans text-secondary-900 dark:text-white">
                           {activity.action}
                         </p>
                         <p className="text-xs text-secondary-500 dark:text-secondary-400 font-mono">
@@ -219,7 +231,7 @@ function DashboardContent() {
             <Card className="p-6 bg-gradient-to-br from-white/95 to-primary-50/80 dark:from-secondary-900/95 dark:to-secondary-800/80 backdrop-blur-lg border border-white/20 dark:border-secondary-700/20 shadow-lg">
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-secondary-900 dark:text-white">
+                  <h3 className="text-lg font-semibold font-mono text-secondary-900 dark:text-white">
                     AI Agent Status
                   </h3>
                   <Users className="w-5 h-5 text-primary-500" />
@@ -232,7 +244,7 @@ function DashboardContent() {
                   ].map((agent, index) => (
                     <div key={index} className="flex items-center justify-between p-3 bg-gradient-to-r from-primary-50/50 to-accent-50/50 dark:from-primary-950/30 dark:to-accent-950/30 rounded-lg border border-primary-200/30 dark:border-primary-800/30">
                       <div className="space-y-1">
-                        <p className="text-sm font-medium text-secondary-900 dark:text-white">
+                        <p className="text-sm font-medium font-sans text-secondary-900 dark:text-white">
                           {agent.name}
                         </p>
                         <p className="text-xs text-secondary-500 dark:text-secondary-400 font-mono">

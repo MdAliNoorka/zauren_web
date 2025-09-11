@@ -33,19 +33,8 @@ export async function GET(request: NextRequest) {
     if (data.session && data.user) {
       console.log('✅ Email confirmed successfully:', data.user.email)
       
-      // Validate redirect URL for security (must be same origin)
-      let redirectUrl = '/dashboard'
-      if (redirect) {
-        try {
-          const redirectUrlObj = new URL(redirect, requestUrl.origin)
-          if (redirectUrlObj.origin === requestUrl.origin) {
-            redirectUrl = redirect
-          }
-        } catch {
-          // Invalid redirect URL, use default
-          redirectUrl = '/dashboard'
-        }
-      }
+      // For email confirmation, always redirect to dashboard
+      const redirectUrl = '/dashboard'
       
       // Create response with proper session cookies
       const response = NextResponse.redirect(new URL(redirectUrl, requestUrl.origin))

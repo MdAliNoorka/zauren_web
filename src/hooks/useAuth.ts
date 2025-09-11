@@ -186,25 +186,30 @@ export function useAuth() {
           setIsAuthenticated(false)
           setLoading(false)
         } else if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') {
-          // Refresh session data when signed in or token refreshed
-          await refreshSession()
+          // Only refresh if we don't already have this session
+          if (!session || session.access_token !== supabaseSession.access_token) {
+            await refreshSession()
+          }
         }
       }
     )
 
     return () => subscription.unsubscribe()
-  }, [supabase.auth, refreshSession])
+  }, [supabase.auth, refreshSession, session])
 
-  // Periodic session validation (every 5 minutes) when authenticated
+  // Periodic session validation (every 10 minutes instead of 5) when authenticated
   useEffect(() => {
-    if (isAuthenticated && !loading) {
+    if (isAuthenticated && !loading && user) {
       const interval = setInterval(() => {
-        refreshSession()
-      }, 5 * 60 * 1000) // 5 minutes
+        // Only refresh if user is still on the page and session exists
+        if (document.visibilityState === 'visible' && session) {
+          refreshSession()
+        }
+      }, 10 * 60 * 1000) // 10 minutes
 
       return () => clearInterval(interval)
     }
-  }, [isAuthenticated, loading, refreshSession])
+  }, [isAuthenticated, loading, refreshSession, user, session])
 
   return {
     user,
